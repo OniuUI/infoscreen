@@ -4,6 +4,9 @@ import NavBar from './navbar';
 import LeftSidebar from './leftsidebar';
 import SquareField from './squarefield';
 import '../components/css/style.css';
+import CurrentTime from './currenttime';
+import Temprature from './temprature';
+
 const Container: React.FC = () => {
     return (
         <div className="container">
@@ -16,9 +19,11 @@ const Container: React.FC = () => {
                             {/* Add your content for the first square field */}
                         </SquareField>
                         <SquareField>
-                            {/* Add your content for the second square field */}
+                            <CurrentTime />
+
                         </SquareField>
                         <SquareField>
+                            <Temprature />
                             {/* Add your content for the third square field */}
                         </SquareField>
                         <SquareField>
