@@ -1,5 +1,6 @@
 // src/components/ThirstyLeaderboard.tsx
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from "../apiConfig"; // Import the API_BASE_URL
 
 interface User {
     firstName: string;
@@ -15,7 +16,7 @@ const ThirstyLeaderboard: React.FC = () => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await fetch('http://localhost:3001/users');
+                const response = await fetch(`${API_BASE_URL}/users`);
                 const data = await response.json();
                 const filteredUsers = data.users.filter(
                     (user: User) => user.coffee > 0 || user.soda > 0

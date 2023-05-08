@@ -1,6 +1,7 @@
 // src/components/AdminForm.tsx
 import React, { useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
+import { API_BASE_URL } from "../../apiConfig"; // Import the API_BASE_URL
 
 const AdminForm: React.FC = () => {
  const [firstName, setFirstName] = useState("");
@@ -22,7 +23,7 @@ const AdminForm: React.FC = () => {
   };
 
   try {
-    const response = await fetch("http://localhost:3001/users", {
+    const response = await fetch(`${API_BASE_URL}/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

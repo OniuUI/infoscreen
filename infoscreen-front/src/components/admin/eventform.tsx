@@ -1,5 +1,6 @@
 // src/components/AdminForm.tsx
 import React, { useState } from "react";
+import { API_BASE_URL } from "../../apiConfig"; // Import the API_BASE_URL
 
 const EventForm: React.FC = () => {
   // Event form state
@@ -19,7 +20,7 @@ const EventForm: React.FC = () => {
     };
 
     try {
-      await fetch("http://localhost:3001/events", {
+      await fetch(`${API_BASE_URL}/events`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,5 +1,6 @@
 // src/components/Event.tsx
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from "../apiConfig"; // Import the API_BASE_URL
 
 interface EventInterface {
   eventName: string;
@@ -20,7 +21,7 @@ const Event: React.FC = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch('http://localhost:3001/events');
+        const response = await fetch(`${API_BASE_URL}/events`);
         const data = await response.json();
         setEvents(data.events);
       } catch (error) {
