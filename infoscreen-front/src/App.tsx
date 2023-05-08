@@ -5,6 +5,7 @@ import logo from './logo.svg';
 import './App.css';
 import Container from "./components/mainbody";
 import Admin from './components/admin/admin';
+import Thirsty from "./components/thirsty/thirsty";
 
 const App: React.FC = () => {
   return (
@@ -13,6 +14,7 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<Container />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/thirsty" element={<Thirsty />} />
         </Routes>
       </div>
     </Router>

@@ -7,6 +7,7 @@ import '../components/css/style.css';
 import CurrentTime from './currenttime';
 import Temprature from './temprature';
 import Event from './event';
+import ThirstyLeaderboard from "./thirstyleaderboard";
 
 const Container: React.FC = () => {
     return (
@@ -26,7 +27,7 @@ const Container: React.FC = () => {
                             <Temprature />
                         </SquareField>
                         <SquareField>
-                            {/* Add your content for the fourth square field */}
+                            <ThirstyLeaderboard />
                         </SquareField>
                     </div>
                 </main>

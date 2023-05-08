@@ -15,8 +15,6 @@ removePastEvents();
 
 // Get all users
 app.get("/users", (req, res) => {
-    removePastEvents();
-    
   fs.readFile(usersFilePath, "utf8", (err, data) => {
     if (err) {
       return res.status(500).send({ error: "Unable to read user data." });
@@ -57,6 +55,64 @@ app.get("/events", (req, res) => {
 
     const events = JSON.parse(data);
     res.send(events);
+  });
+});
+
+// Update coffees and sodas count for a user
+app.put('/users/:userId/drinks', (req, res) => {
+  const userId = parseInt(req.params.userId);
+  const { coffees, sodas } = req.body;
+
+  fs.readFile(usersFilePath, 'utf8', (err, data) => {
+    if (err) {
+      return res.status(500).send({ error: 'Unable to read user data.' });
+    }
+
+    const usersData = JSON.parse(data);
+    const user = usersData.users.find(user => user.id === userId);
+
+    if (user) {
+      user.coffees = coffees;
+      user.sodas = sodas;
+
+      fs.writeFile(usersFilePath, JSON.stringify(usersData), (err) => {
+        if (err) {
+          return res.status(500).send({ error: 'Unable to save user data.' });
+        }
+        res.send({ success: true });
+      });
+    } else {
+      res.status(404).send({ error: 'User not found.' });
+    }
+  });
+});
+
+// Update coffee and soda values for a user
+app.put('/users/:id/coffee-soda', (req, res) => {
+  const userId = req.params.id;
+  const { coffee, soda } = req.body;
+
+  fs.readFile(usersFilePath, 'utf8', (err, data) => {
+    if (err) {
+      return res.status(500).send({ error: 'Unable to read user data.' });
+    }
+
+    const usersData = JSON.parse(data);
+    const userIndex = usersData.users.findIndex(user => user.id === userId);
+
+    if (userIndex === -1) {
+      return res.status(404).send({ error: 'User not found.' });
+    }
+
+    usersData.users[userIndex].coffee = coffee;
+    usersData.users[userIndex].soda = soda;
+
+    fs.writeFile(usersFilePath, JSON.stringify(usersData), (err) => {
+      if (err) {
+        return res.status(500).send({ error: 'Unable to save user data.' });
+      }
+      res.send({ success: true });
+    });
   });
 });
 

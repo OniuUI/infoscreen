@@ -15,7 +15,7 @@ const removePastEvents = () => {
     const currentDate = new Date();
     const filteredEvents = eventsData.events.filter((event) => {
       const eventDate = new Date(event.eventDate);
-      return eventDate >= currentDate;
+      return eventDate > currentDate;
     });
 
     eventsData.events = filteredEvents;

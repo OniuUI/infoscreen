@@ -1,5 +1,6 @@
 // src/components/AdminForm.tsx
 import React, { useState } from "react";
+import { v4 as uuidv4 } from 'uuid';
 
 const AdminForm: React.FC = () => {
  const [firstName, setFirstName] = useState("");
@@ -7,38 +8,42 @@ const AdminForm: React.FC = () => {
   const [birthdate, setBirthdate] = useState("");
   const [imageUrl, setImageUrl] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  event.preventDefault();
 
-    const newUser = {
-      firstName,
-      lastName,
-      birthdate,
-      imageUrl,
-    };
+  const newUser = {
+    id: uuidv4(), // Generate a unique ID for the new user
+    firstName,
+    lastName,
+    birthdate,
+    imageUrl,
+    coffee: 0,
+    soda: 0,
+  };
 
-    try {
-      const response = await fetch("http://localhost:3001/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newUser),
-      });
+  try {
+    const response = await fetch("http://localhost:3001/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newUser),
+    });
 
-      if (response.ok) {
-        alert("User added successfully");
-        setFirstName("");
-        setLastName("");
-        setBirthdate("");
-        setImageUrl("");
-      } else {
-        alert("Error adding user");
-      }
-    } catch (error) {
-      console.error("Error adding user:", error);
-      alert("Error adding user");
+    const data = await response.json();
+    if (data.success) {
+      alert("User added successfully!");
+      setFirstName("");
+      setLastName("");
+      setBirthdate("");
+      setImageUrl("");
+    } else {
+      alert("Failed to add user. Please try again.");
     }
+  } catch (error) {
+    console.error("Error adding user:", error);
+    alert("Failed to add user. Please try again.");
+  }
   };
 
   return (
