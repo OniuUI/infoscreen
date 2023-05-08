@@ -1,46 +1,50 @@
-# Getting Started with Create React App
+# Infoscreen Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This frontend application is built with React and TypeScript. It displays users and events fetched from the Infoscreen backend.
 
-## Available Scripts
+## Installation
 
-In the project directory, you can run:
+Before running the application, make sure you have Node.js and npm installed. If you don't have Node.js installed, download it from the [official website](https://nodejs.org/en/download/).
 
-### `npm start`
+Next, install the required packages:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```bash
+npm install
+```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Usage
 
-### `npm test`
+To start the development server, run the following command in your terminal:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+npm start
+```
 
-### `npm run build`
+The application will start on port 3000 (or the port specified in the `PORT` environment variable). You can access the application at `http://localhost:3000`.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Components
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+The application consists of the following components:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- `LeftSidebar`: Displays the list of users fetched from the backend.
+- `Temperature`: Displays the current temperature and weather icon.
+- `Event`: Displays the list of events fetched from the backend.
+- `AdminForm`: Provides forms to add users and events to the backend.
 
-### `npm run eject`
+## Customization
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+You can customize the application by editing the components and their styles. The styles are written in CSS and can be found in the respective component's `.tsx` file.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Deployment
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+To build the application for production, run the following command:
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```bash
+npm run build
+```
 
-## Learn More
+The build folder will contain the compiled files, which can be served using any web server.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## License
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+[MIT](https://choosealicense.com/licenses/mit/)
