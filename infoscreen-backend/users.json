@@ -1,0 +1,22 @@
+{
+    "users": [
+        {
+            "firstName": "Audun",
+            "lastName": "Nymoen",
+            "birthdate": "1990-05-07",
+            "imageUrl": "https://media.licdn.com/dms/image/C4D03AQGwkePfutvEkQ/profile-displayphoto-shrink_800_800/0/1572261670240?e=2147483647&v=beta&t=5JfcJQ9VqqppKokramMVRYDEGxvpG-ZiCBt_CTpHH6A"
+        },
+        {
+            "firstName": "Jane",
+            "lastName": "Smith",
+            "birthdate": "1985-11-20",
+            "imageUrl": "https://example.com/jane-smith.jpg"
+        },
+        {
+            "firstName": "audun",
+            "lastName": "nymoen",
+            "birthdate": "2023-05-08",
+            "imageUrl": "https://media.licdn.com/dms/image/C4D03AQGwkePfutvEkQ/profile-displayphoto-shrink_800_800/0/1572261670240?e=2147483647&v=beta&t=5JfcJQ9VqqppKokramMVRYDEGxvpG-ZiCBt_CTpHH6A"
+        }
+    ]
+}

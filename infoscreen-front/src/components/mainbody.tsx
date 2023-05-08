@@ -6,6 +6,7 @@ import SquareField from './squarefield';
 import '../components/css/style.css';
 import CurrentTime from './currenttime';
 import Temprature from './temprature';
+import Event from './event';
 
 const Container: React.FC = () => {
     return (
@@ -16,15 +17,13 @@ const Container: React.FC = () => {
                 <main>
                     <div className="grid">
                         <SquareField>
-                            {/* Add your content for the first square field */}
+                            <Event />
                         </SquareField>
                         <SquareField>
                             <CurrentTime />
-
                         </SquareField>
                         <SquareField>
                             <Temprature />
-                            {/* Add your content for the third square field */}
                         </SquareField>
                         <SquareField>
                             {/* Add your content for the fourth square field */}
