@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Person from '../person';
 import { API_BASE_URL } from "../../apiConfig"; // Import the API_BASE_URL
+import thirstylogo from '../img/thirsty.svg';
 
 const Thirsty: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);
@@ -50,25 +51,35 @@ const Thirsty: React.FC = () => {
 };
  
 
+ // ...other code
+
   return (
-      <div className="thirsty">
-          {users.map((user) => (
-              <div key={user.id}>
-                  <Person {...user} />
-          <div>
-            <p>Coffee: {user.coffee}</p>
+    <div className="thirsty">
+      <div className="thirsty-masthead">
+        <img src={thirstylogo} alt="Thirsty" />
+      </div>
+      {users.map((user) => (
+        <div className="user-card" key={user.id}>
+          <Person {...user} />
+          <div className="user-actions">
+            <div>
+              <p>Coffee: {user.coffee}</p>
               <button onClick={() => updateThirst(user.id, 'coffee', 'add')}>Add Coffee</button>
               <button onClick={() => updateThirst(user.id, 'coffee', 'subtract')}>Subtract Coffee</button>
-          </div>
-          <div>
-            <p>Soda: {user.soda}</p>
+            </div>
+            <div>
+              <p>Soda: {user.soda}</p>
               <button onClick={() => updateThirst(user.id, 'soda', 'add')}>Add Soda</button>
               <button onClick={() => updateThirst(user.id, 'soda', 'subtract')}>Subtract Soda</button>
+            </div>
           </div>
         </div>
-      ))}
+        ))}
     </div>
     );
+
+  // ...other code
+
 };
 
 export default Thirsty;

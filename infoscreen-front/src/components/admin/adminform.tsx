@@ -48,9 +48,9 @@ const AdminForm: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="form-container">
       <h1>Add User</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="admin-form">
         <label>
           First Name:
           <input
@@ -58,9 +58,9 @@ const AdminForm: React.FC = () => {
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             required
+            className="form-input"
           />
         </label>
-        <br />
         <label>
           Last Name:
           <input
@@ -68,9 +68,9 @@ const AdminForm: React.FC = () => {
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             required
+            className="form-input"
           />
         </label>
-        <br />
         <label>
           Birthdate:
           <input
@@ -78,9 +78,9 @@ const AdminForm: React.FC = () => {
             value={birthdate}
             onChange={(e) => setBirthdate(e.target.value)}
             required
+            className="form-input"
           />
         </label>
-        <br />
         <label>
           Image URL:
           <input
@@ -88,13 +88,13 @@ const AdminForm: React.FC = () => {
             value={imageUrl}
             onChange={(e) => setImageUrl(e.target.value)}
             required
+            className="form-input"
           />
         </label>
-        <br />
-        <button type="submit">Add User</button>
+        <button type="submit" className="form-button">Add User</button>
       </form>
     </div>
-  );
+    );
 };
 
 

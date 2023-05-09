@@ -5,7 +5,7 @@ import EventForm from "./eventform";
 
 const Admin: React.FC = () => {
     return (
-        <div>
+        <div className="admin-page">
             <h1>Admin Page</h1>
             <AdminForm/>
             <EventForm/>

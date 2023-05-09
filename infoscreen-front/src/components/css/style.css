@@ -189,3 +189,128 @@ header {
 .event p:last-child {
     text-align: right;
 }
+
+/* Admin */
+.admin-page {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.form-container {
+    background-color: #f0f0f0;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+}
+
+.admin-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-form label {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+.form-input {
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.form-button {
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: none;
+    color: #fff;
+    background-color: #007BFF;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.form-button:hover {
+    background-color: #0056b3;
+}
+
+.event-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.event-form .form-button {
+    background-color: #28a745;
+}
+
+.event-form .form-button:hover {
+    background-color: #218838;
+}
+
+
+/* Thirsty */
+.thirsty {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.thirsty-masthead {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.thirsty-masthead img {
+  max-width: 100%;
+  height: auto;
+}
+
+.user-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f0f0f0;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  width: 90%;
+  max-width: 600px;
+}
+
+.user-actions {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.user-actions div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.user-actions button {
+  color: white;
+  background-color: #007BFF;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.user-actions button:hover {
+  background-color: #0056b3;
+}

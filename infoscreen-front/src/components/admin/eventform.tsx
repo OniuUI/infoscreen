@@ -35,31 +35,38 @@ const EventForm: React.FC = () => {
     }
   };
 
-  return (
-    <div>
-      <h2>Add Event</h2>
-      <div>
-        <label>
-          Event Name:
-          <input
-            type="text"
-            value={eventName}
-            onChange={(e) => setEventName(e.target.value)}
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          Event Date:
-          <input
-            type="date"
-            value={eventDate}
-            onChange={(e) => setEventDate(e.target.value)}
-          />
-        </label>
-      </div>
-      <button onClick={addEvent}>Add Event</button>
-    </div>
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  event.preventDefault(); // This prevents the default form submission behavior
+  addEvent();
+};
+
+return (
+  <div className="form-container">
+    <h2>Add Event</h2>
+    <form className="event-form" onSubmit={handleSubmit}>
+      <label>
+        Event Name:
+        <input
+          type="text"
+          value={eventName}
+          onChange={(e) => setEventName(e.target.value)}
+          className="form-input"
+          required
+        />
+      </label>
+      <label>
+        Event Date:
+        <input
+          type="date"
+          value={eventDate}
+          onChange={(e) => setEventDate(e.target.value)}
+          className="form-input"
+          required
+        />
+      </label>
+      <button type="submit" className="form-button">Add Event</button>
+    </form>
+  </div>
   );
 };
 
