@@ -31,13 +31,19 @@ const ThirstyLeaderboard: React.FC = () => {
         };
 
         fetchUsers();
+        const interval = setInterval(() => {
+            fetchUsers();
+            }, 60 * 250); // 60 * 1000 ms = 15 sec
+
+        // Clean up the interval when the component is unmounted
+        return () => clearInterval(interval);
         }, []);
     
     const [winner, ...rest] = users;
 
     return (
         <div>
-            <h1>Leaderboard</h1>
+            <h1>Workaholic of the day</h1>
             {winner && (
                 <div style={{ textAlign: 'center' }}>
                     <img
@@ -50,19 +56,16 @@ const ThirstyLeaderboard: React.FC = () => {
                         {winner.firstName} {winner.lastName}
                     </h2>
                     <p>
-                        Coffees: {winner.coffee}, Sodas: {winner.soda}
+                        ☕: {winner.coffee}, 🥤: {winner.soda}
                     </p>
                 </div>
                 )}
-            <div>
+                <div>
                 {rest.map((user, index) => (
                     <div key={index}>
                         <h4>
-                            {user.firstName} {user.lastName}
+                            {user.firstName} {user.lastName} ☕: {user.coffee}, 🥤: {user.soda}
                         </h4>
-                        <p>
-                            Coffees: {user.coffee}, Sodas: {user.soda}
-                        </p>
                     </div>
                     ))}
             </div>

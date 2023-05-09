@@ -23,6 +23,15 @@ const Event: React.FC = () => {
       try {
         const response = await fetch(`${API_BASE_URL}/events`);
         const data = await response.json();
+
+        // Add sorting here
+        data.events.sort((a: EventInterface, b: EventInterface) => {
+          const dateA = new Date(a.eventDate);
+          const dateB = new Date(b.eventDate);
+
+          return dateA.getTime() - dateB.getTime(); // Ascending order
+        });
+
         setEvents(data.events);
       } catch (error) {
         console.error('Error fetching event data:', error);
@@ -38,10 +47,12 @@ const Event: React.FC = () => {
         const daysToEvent = calculateDaysToEvent(event.eventDate);
         const daysToEventText = daysToEvent === 0 ? 'Today' : `Days to event: ${daysToEvent}`;
         return (
-          <div key={index}>
+          <div key={index} className={"event"}>
             <h3>{event.eventName}</h3>
-            <p>Date: {event.eventDate}</p>
-            <p>{daysToEventText}</p>
+            <div className="event-details">
+              <p>Date: {event.eventDate}</p>
+              <p>{daysToEventText}</p>
+            </div>
           </div>
         );
       })}

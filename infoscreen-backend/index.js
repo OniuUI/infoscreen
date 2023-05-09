@@ -3,6 +3,7 @@ const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 const { removePastEvents } = require('./utils');
+const { scheduleResetLeaderboard } = require('./sheduledtasks');
 
 const app = express();
 app.use(cors());
@@ -11,7 +12,9 @@ app.use(express.json());
 const usersFilePath = path.join(__dirname, "users.json");
 const eventsFilePath = path.join(__dirname, "events.json");
 
+// Server startup events.
 removePastEvents();
+scheduleResetLeaderboard();
 
 // Get all users
 app.get("/users", (req, res) => {
