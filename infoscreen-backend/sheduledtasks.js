@@ -5,14 +5,16 @@ const cron = require('node-cron');
 const resetLeaderboard = async () => {
   try {
     const data = fs.readFileSync(path.resolve(__dirname, './users.json'));
-    const users = JSON.parse(data);
+    const jsonData = JSON.parse(data);
+    const users = jsonData.users; // Access the 'users' property of the object
 
     for (let user of users) {
       user.coffee = 0;
       user.soda = 0;
     }
 
-    fs.writeFileSync(path.resolve(__dirname, './users.json'), JSON.stringify(users));
+    // Write the updated data back to the file
+    fs.writeFileSync(path.resolve(__dirname, './users.json'), JSON.stringify(jsonData, null, 2));
     console.log('Successfully reset leaderboard');
   } catch (error) {
     console.error('Error resetting leaderboard:', error);
@@ -25,5 +27,5 @@ const scheduleResetLeaderboard = () => {
 };
 
 module.exports = {
-    scheduleResetLeaderboard,
+  scheduleResetLeaderboard,
 };

@@ -34,6 +34,8 @@ main {
     align-content: flex-start;
     height: 100%; /* Add a fixed height */
     width: 100%;
+    padding-bottom: 1vh;
+    padding-top: 1vh;
 }
 
 .square-field {
@@ -43,7 +45,6 @@ main {
   border: 1px solid #ccc;
   display: flex;
   justify-content: center;
-  align-items: center;
   margin-bottom: 16px;
   overflow: auto;
 }
@@ -110,8 +111,11 @@ header {
     color: #ffffff;
 }
 .current-time {
+    display: flex;
     font-size: 5.5rem; /* Adjust the font size as needed */
   font-weight: bold;
+  justify-content: center;
+  align-items: center;
 }
 
 /*person */
@@ -159,16 +163,21 @@ header {
 
 
 /* Event */
+.event-container {
+    width: 100%;
+    padding: 1vh;
+}
 
 .event {
     display: flex;
     width: 100%;
     justify-content: space-between;
     align-items: center;
-    background-color: #f0f0f0;
+    background-color: #fff;
     border-radius: 10px; /* Add rounded corners */
     padding: 15px; /* Add some padding */
     margin-bottom: 10px; /* Add some margin to separate the cards */
+    margin-top: 1vh;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Add a slight shadow for depth */
 }
 
@@ -313,4 +322,12 @@ header {
 
 .user-actions button:hover {
   background-color: #0056b3;
+}
+
+/* Temprature */
+.temprature {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }

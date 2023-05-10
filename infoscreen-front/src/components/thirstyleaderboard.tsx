@@ -1,6 +1,8 @@
 // src/components/ThirstyLeaderboard.tsx
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from "../apiConfig"; // Import the API_BASE_URL
+import './css/leaderboard.css';
+import workaholic from './img/workaholic.svg';
 
 interface User {
     firstName: string;
@@ -39,17 +41,16 @@ const ThirstyLeaderboard: React.FC = () => {
         return () => clearInterval(interval);
         }, []);
     
-    const [winner, ...rest] = users;
+    const [winner, second, third, ...rest] = users;
 
     return (
-        <div>
-            <h1>Workaholic of the day</h1>
+        <div className="leaderboard">
+            <img src={workaholic} alt="Workaholic of the day" />
             {winner && (
-                <div style={{ textAlign: 'center' }}>
+                <div className="winner">
                     <img
                         src={winner.imageUrl}
                         alt={`${winner.firstName} ${winner.lastName}`}
-                        style={{ width: '100px', height: '100px', borderRadius: '50%' }}
                     />
                     <div>👑</div>
                     <h2>
@@ -59,15 +60,34 @@ const ThirstyLeaderboard: React.FC = () => {
                         ☕: {winner.coffee}, 🥤: {winner.soda}
                     </p>
                 </div>
+            )}
+
+            <div className="runner-up">
+                {second && (
+                    <div className="second-place">
+                        <div>🥈</div>
+                        <h3>{second.firstName} {second.lastName}</h3>
+                        <p>☕: {second.coffee}, 🥤: {second.soda}</p>
+                    </div>
                 )}
-                <div>
+
+                {third && (
+                    <div className="third-place">
+                        <div>🥉</div>
+                        <h3>{third.firstName} {third.lastName}</h3>
+                        <p>☕: {third.coffee}, 🥤: {third.soda}</p>
+                    </div>
+                )}
+            </div>
+
+            <div className="rest">
                 {rest.map((user, index) => (
-                    <div key={index}>
+                    <div key={index} className="others">
                         <h4>
                             {user.firstName} {user.lastName} ☕: {user.coffee}, 🥤: {user.soda}
                         </h4>
                     </div>
-                    ))}
+                ))}
             </div>
         </div>
         );

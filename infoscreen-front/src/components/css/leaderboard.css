@@ -1,0 +1,241 @@
+/* Thirsty Leaderboard */
+.leaderboard {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #7AA560;
+  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.2);
+  margin-top: 0;
+  overflow: auto;
+}
+
+.leaderboard::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.leaderboard {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.leaderboard h1 {
+    color: #fff;
+    margin: 0;
+}
+
+.winner h2 {
+    color: black;
+    margin: 0;
+}
+
+.winner p {
+    color: black;
+    margin: 0;
+}
+
+
+
+.winner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1);
+    width: 90%;
+    position: relative;
+    overflow: hidden;
+    padding-top: 3vh;
+    padding-bottom: 2vh;
+    background: linear-gradient(
+        to right,
+    #462523 0,
+    #cb9b51 22%, 
+    #f6e27a 45%,
+    #f6f2c0 50%,
+    #f6e27a 55%,
+    #cb9b51 78%,
+    #462523 100%
+  );
+    background-size: 200% 100%;
+    background-position: 100% 0;
+    animation: gradient 3s ease infinite;
+}
+
+@keyframes gradient {
+    0% { background-position: -100% 0; }
+  100% { background-position: 100% 0; }
+}
+/* Add a shine effect to the winner card */
+.winner::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(-30deg);
+  pointer-events: none;
+  animation: shine 2s infinite;
+}
+
+@keyframes shine {
+  0% {background-position: -200% -200%;}
+  50% {background-position: 200% 200%;}
+  100% {background-position: -200% -200%;}
+}
+
+.winner img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  position: relative; /* added to position the crown */
+  z-index: 1; /* added to position the crown */
+}
+
+.winner div {
+  font-size: 1.5em;
+  position: absolute; /* added to position the crown */
+  top: 0; /* added to position the crown */
+  left: 48%; /* added to position the crown */
+  transform: translateX(-50%); /* added to position the crown */
+  z-index: 2; /* added to position the crown */
+  animation: bounce 1s infinite; /* added for bounce effect */
+  margin-top: 0.5vh;
+}
+
+@keyframes bounce {
+  0%, 100% {transform: translateY(0);}
+  50% {transform: translateY(-10px);}
+}
+
+
+.runner-up {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    position: relative; /* added for shine effect */
+    padding-top: 1vh;
+  
+  background-color: #7AA560; /* Silver color for the second place */
+}
+ 
+.runner-up h3 {
+    margin: 0;
+    padding: 0;
+}
+
+.second-place {
+    width: 80%;
+    border-radius: 5px;
+    box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.1);
+    background: linear-gradient(
+        120deg,
+    #c5c6c7 0,
+    #e5e6e7 25%, 
+    #f3f4f5 50%,
+    #e5e6e7 75%,
+    #c5c6c7 100%
+  );
+    background-size: 200% 200%;
+    animation: gradient-second 3s linear infinite;
+}
+
+@keyframes gradient-second {
+    0% {background-position: 100% 0;}
+  50% {background-position: 0 100%;}
+  100% {background-position: 100% 0;}
+}
+
+
+.second-place p {
+    margin: 0;
+    padding: 0;
+}
+
+
+.third-place {
+    width: 80%;
+    height: 100%;
+    border-radius: 5px;
+    box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.1);
+    background: linear-gradient(
+        120deg,
+    #8c6046 0,
+    #d69a6d 25%, 
+    #f3ca96 50%,
+    #d69a6d 75%,
+    #8c6046 100%
+  );
+    background-size: 200% 200%;
+    animation: gradient 3s linear infinite;
+}
+
+@keyframes gradient {
+    0% {background-position: 100% 0;}
+  50% {background-position: 0 100%;}
+  100% {background-position: 100% 0;}
+}
+
+.third-place p {
+    margin: 0;
+    padding: 0;
+}
+
+.rest {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    position: relative; /* added for shine effect */
+    
+    padding-top: 1vh;
+    background-color: #7AA560; /* Silver color for the second place */
+    overflow: auto;
+}
+
+@keyframes breathe {
+    0%, 100% {
+        opacity: 1;
+    }
+  50% {
+        opacity: 0.8;
+    }
+}
+
+.rest::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.rest {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+
+.others {
+    width: 80%;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white */
+  backdrop-filter: blur(10px); /* This will blur the background */
+  box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Optional: Add a border */
+  animation: breathe 2s infinite;
+}
+.others h4 {
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+.others p {
+    margin: 0;
+    padding: 0;
+    color: #666;
+}

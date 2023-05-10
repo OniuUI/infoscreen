@@ -38,7 +38,7 @@ const Temperature: React.FC = () => {
 
   return (
     <div>
-      <div style={{ textAlign: 'center' }}>
+      <div className={'temprature'} style={{ textAlign: 'center' }}>
         <h1>Fornebu</h1>
         {symbolCode && <WeatherIcon symbolCode={symbolCode} />}
         {temperature !== null && (
