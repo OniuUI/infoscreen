@@ -1,6 +1,6 @@
-// src/components/Event.tsx
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from "../apiConfig"; // Import the API_BASE_URL
+import NoEvents from './img/noevents.svg'; // Import your SVG image
 
 interface EventInterface {
   eventName: string;
@@ -42,22 +42,29 @@ const Event: React.FC = () => {
     };
 
     fetchEvents();
+    const intervalId = setInterval(fetchEvents, 30000); // Fetch every 30 seconds
+
+    return () => clearInterval(intervalId); // Cleanup interval on unmount
   }, []);
 
   return (
     <div className={'event-container'}>
-      {events.map((event, index) => {
-        const daysToEventText = event.daysToEvent;
-        return (
-          <div key={index} className={"event"}>
-            <h3>{event.eventName}</h3>
-            <div className="event-details">
-              <p>Date: {event.eventDate}</p>
-              <p>{daysToEventText}</p>
+      {events.length > 0 ?
+        events.map((event, index) => {
+          const daysToEventText = event.daysToEvent === 0 ? 'Today' : `Days to event: ${event.daysToEvent}`;
+          return (
+            <div key={index} className={"event"}>
+              <h3>{event.eventName}</h3>
+              <div className="event-details">
+                <p>Date: {event.eventDate}</p>
+                <p>{daysToEventText}</p>
+              </div>
             </div>
-          </div>
-          );
-      })}
+            );
+        })
+        :
+        <img src={NoEvents} alt="No events" className="no-events-img" />
+      }
     </div>
     );
 };

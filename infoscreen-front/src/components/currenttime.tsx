@@ -14,9 +14,15 @@ const CurrentTime: React.FC = () => {
     };
   }, []);
 
-  const formattedTime = time.toLocaleTimeString();
+  const formattedTime = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second:'2-digit', hour12: false });
+  const formattedDay = new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(time);
 
-  return <span className="current-time">{formattedTime}</span>;
+  return (
+    <div className="current-time-container">
+      <span className="current-day">{formattedDay.toUpperCase()}</span>
+      <span className="current-time">{formattedTime}</span>
+    </div>
+    );
 };
 
 export default CurrentTime;

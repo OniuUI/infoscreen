@@ -1,6 +1,6 @@
-// src/components/Temperature.tsx
 import React, { useState, useEffect } from "react";
 import WeatherIcon from "./weathericon";
+import './css/temprature.css'; // Import the CSS file
 
 const Temperature: React.FC = () => {
   const [temperature, setTemperature] = useState<number | null>(null);
@@ -37,22 +37,22 @@ const Temperature: React.FC = () => {
   }, []);
 
   return (
-    <div>
-      <div className={'temprature'} style={{ textAlign: 'center' }}>
-        <h1>Fornebu</h1>
-        {symbolCode && <WeatherIcon symbolCode={symbolCode} />}
+    <div className="weather-card">
+      <div className='temperature'>
+        <h1 className='location-name'>Fornebu</h1>
+        {symbolCode && <WeatherIcon symbolCode={symbolCode} className='weather-icon' />}
         {temperature !== null && (
-          <p style={{ fontSize: '24px', fontWeight: 'bold' }}>
+          <p className='temperature-value'>
             {temperature.toFixed(1)}°C
           </p>
         )}
         {feelsLike !== null && (
-          <p style={{ fontSize: '16px' }}>
+          <p className='feels-like'>
             Feels like {feelsLike.toFixed(1)}°C
           </p>
         )}
         {windSpeed !== null && (
-          <p style={{ fontSize: '16px' }}>
+          <p className='wind-speed'>
             {windIcon} Wind: {windSpeed.toFixed(1)} m/s
           </p>
         )}
