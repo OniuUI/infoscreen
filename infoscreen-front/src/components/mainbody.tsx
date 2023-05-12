@@ -8,6 +8,8 @@ import CurrentTime from './currenttime';
 import Temprature from './temprature';
 import Event from './event';
 import ThirstyLeaderboard from "./thirstyleaderboard";
+import Carousel from './carousel';
+import NewsFeed from "./newsfeed";
 
 const Container: React.FC = () => {
     return (
@@ -18,13 +20,16 @@ const Container: React.FC = () => {
                 <main>
                     <div className="grid">
                         <SquareField>
-                            <Event />
+                             <Event />
                         </SquareField>
                         <SquareField>
-                            <CurrentTime />
+                             <CurrentTime />
                         </SquareField>
                         <SquareField>
-                            <Temprature />
+                            <Carousel interval={420000}>
+                                <Temprature />
+                                <NewsFeed />
+                            </Carousel>
                         </SquareField>
                         <SquareField>
                             <ThirstyLeaderboard />

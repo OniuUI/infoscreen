@@ -1,0 +1,74 @@
+/* CSS for Newsfeed component with flexbox and scrolling effect */
+
+.newsfeed-container {
+    height: 100vh;
+}
+
+.newsfeed {
+    display: flex;
+    flex-direction: column;
+    scroll-snap-type: y mandatory;
+}
+
+.news-card {
+    scroll-snap-align: start;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    width: 70vh;
+    height: 17vh;
+    animation: scrollAnimation 420s linear infinite;
+}
+
+    
+@keyframes scrollAnimation {
+    0% {
+        transform: translateY(0);
+    }
+  100% {
+        transform: translateY(-11300%);
+    }
+}
+
+
+.news-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.news-content {
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.news-meta {
+  display: flex;
+  align-items: center;
+}
+
+.news-date{
+  font-size: 12px;
+  color: #777;
+  margin-right: 10px;
+}
+
+.news-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.news-category {
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+  color: #555;
+}

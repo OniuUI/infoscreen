@@ -4,8 +4,10 @@ const fs = require("fs");
 const path = require("path");
 const { removePastEvents } = require('./utils');
 const { scheduleResetLeaderboard } = require('./sheduledtasks');
+const RSSParser = require('rss-parser');
 
 const app = express();
+const parser = new RSSParser();
 app.use(cors());
 app.use(express.json());
 
@@ -229,6 +231,12 @@ app.put("/events/:id", (req, res) => {
       res.send({ success: true });
     });
   });
+});
+// Get RSS feed
+
+app.get('/rss', async (req, res) => {
+  let feed = await parser.parseURL('https://www.nrk.no/toppsaker.rss');
+  res.json(feed);
 });
 
 // Delete an event

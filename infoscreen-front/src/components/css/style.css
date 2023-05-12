@@ -38,6 +38,8 @@ main {
     padding-top: 1vh;
 }
 
+
+
 .square-field {
   width: calc(50% - 16px); /* accounting for the grid gap */
   height: calc(50% - 8px); /* accounting for the grid gap */
