@@ -1,17 +1,25 @@
-// src/components/Container.tsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import NavBar from './navbar';
 import LeftSidebar from './leftsidebar';
 import SquareField from './squarefield';
 import '../components/css/style.css';
 import CurrentTime from './currenttime';
-import Temprature from './temprature';
+import Temperature from './temperature';
 import Event from './event';
 import ThirstyLeaderboard from "./thirstyleaderboard";
 import Carousel from './carousel';
 import NewsFeed from "./newsfeed";
 
 const Container: React.FC = () => {
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            window.location.reload();
+        }, 4 * 60 * 60 * 1000); // 4 hours
+
+        return () => clearInterval(intervalId); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+    }, [])
+
     return (
         <div className="container">
             <NavBar />
@@ -27,7 +35,7 @@ const Container: React.FC = () => {
                         </SquareField>
                         <SquareField>
                             <Carousel interval={420000}>
-                                <Temprature />
+                                <Temperature />
                                 <NewsFeed />
                             </Carousel>
                         </SquareField>
