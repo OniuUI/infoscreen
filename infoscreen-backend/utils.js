@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const eventsFilePath = path.join(__dirname, 'events.json');
+const eventsFilePath = path.join(__dirname, 'data/events.json');
 
 const removePastEvents = () => {
   fs.readFile(eventsFilePath, 'utf8', (err, data) => {
