@@ -9,6 +9,7 @@ import Event from './event';
 import ThirstyLeaderboard from "./thirstyleaderboard";
 import Carousel from './carousel';
 import NewsFeed from "./newsfeed";
+import Gallery from "./gallery";
 
 const Container: React.FC = () => {
 
@@ -40,7 +41,10 @@ const Container: React.FC = () => {
                             </Carousel>
                         </SquareField>
                         <SquareField>
-                            <ThirstyLeaderboard />
+                            <Carousel interval={420000}>
+                                <Gallery />
+                                <ThirstyLeaderboard />
+                            </Carousel>
                         </SquareField>
                     </div>
                 </main>

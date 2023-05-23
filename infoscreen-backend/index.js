@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");
+const path = require('path');
 const { scheduleResetLeaderboard } = require('./sheduledtasks');
 
 const userRoutes = require('./routes/userRoutes');
@@ -17,6 +18,7 @@ const limiter = rateLimit({
 });
 
 app.use(cors());
+app.use('/images', express.static(path.join(__dirname, 'data/images')));
 app.use(express.json());
 
 // Server startup events.
