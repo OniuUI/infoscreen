@@ -11,7 +11,13 @@ const removePastEvents = () => {
       return;
     }
 
-    const eventsData = JSON.parse(data);
+    let eventsData;
+    try {
+      eventsData = JSON.parse(data);
+    } catch (error) {
+      console.error('Unable to parse event data:', error);
+      return;
+    }
     const currentDate = new Date();
     const filteredEvents = eventsData.events.filter((event) => {
       const eventDate = new Date(event.eventDate);
