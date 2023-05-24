@@ -41,10 +41,7 @@ const Container: React.FC = () => {
                             </Carousel>
                         </SquareField>
                         <SquareField>
-                            <Carousel interval={420000}>
-                                <Gallery />
                                 <ThirstyLeaderboard />
-                            </Carousel>
                         </SquareField>
                     </div>
                 </main>
