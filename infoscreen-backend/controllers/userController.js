@@ -1,147 +1,89 @@
-const fs = require('fs');
-const path = require('path');
+const { getDb } = require('../db');
+let db = getDb();
 
-const usersFilePath = path.join(__dirname, "../data/users.json");
 
-exports.getAllUsers = (req, res) => {
-    fs.readFile(usersFilePath, "utf8", (err, data) => {
-        if (err) {
-            return res.status(500).send({ error: "Unable to read user data." });
-        }
 
-        const users = JSON.parse(data);
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await db.collection('users').find().toArray();
         res.send(users);
-    });
+    } catch (err) {
+        res.status(500).send({ error: "Unable to read user data." });
+    }
 };
 
-exports.addUser = (req, res) => {
-    const newUser = req.body;
-
-    fs.readFile(usersFilePath, "utf8", (err, data) => {
-        if (err) {
-            return res.status(500).send({ error: "Unable to read user data." });
-        }
-
-        const usersData = JSON.parse(data);
-        usersData.users.push(newUser);
-
-        fs.writeFile(usersFilePath, JSON.stringify(usersData), (err) => {
-            if (err) {
-                return res.status(500).send({ error: "Unable to save user data." });
-            }
-            res.send({ success: true });
-        });
-    });
+exports.addUser = async (req, res) => {
+    try {
+        const newUser = req.body;
+        await db.collection('users').insertOne(newUser);
+        res.send({ success: true });
+    } catch (err) {
+        res.status(500).send({ error: "Unable to save user data." });
+    }
 };
 
-exports.updateUser = (req, res) => {
-    const updatedUser = req.body;
-    const userId = req.params.id;
+exports.updateUser = async (req, res) => {
+    try {
+        const updatedUser = req.body;
+        const userId = req.params.id;
+        const result = await db.collection('users').replaceOne({ _id: ObjectID(userId) }, updatedUser);
 
-    fs.readFile(usersFilePath, "utf8", (err, data) => {
-        if (err) {
-            return res.status(500).send({ error: "Unable to read user data." });
-        }
-
-        const usersData = JSON.parse(data);
-        const userIndex = usersData.users.findIndex(user => user.id === userId);
-
-        if (userIndex === -1) {
+        if (result.matchedCount === 0) {
             return res.status(404).send({ error: 'User not found.' });
         }
-
-        // Update the user's data
-        usersData.users[userIndex] = updatedUser;
-
-        fs.writeFile(usersFilePath, JSON.stringify(usersData), (err) => {
-            if (err) {
-                return res.status(500).send({ error: "Unable to save user data." });
-            }
-            res.send({ success: true });
-        });
-    });
+        res.send({ success: true });
+    } catch (err) {
+        res.status(500).send({ error: "Unable to update user data." });
+    }
 };
 
-exports.deleteUser = (req, res) => {
-    const userId = req.params.id;
+exports.deleteUser = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const result = await db.collection('users').deleteOne({ _id: ObjectID(userId) });
 
-    fs.readFile(usersFilePath, "utf8", (err, data) => {
-        if (err) {
-            return res.status(500).send({ error: "Unable to read user data." });
-        }
-
-        const usersData = JSON.parse(data);
-        const userIndex = usersData.users.findIndex(user => user.id === userId);
-
-        if (userIndex === -1) {
+        if (result.deletedCount === 0) {
             return res.status(404).send({ error: 'User not found.' });
         }
-
-        // Remove the user from the array
-        usersData.users.splice(userIndex, 1);
-
-        fs.writeFile(usersFilePath, JSON.stringify(usersData), (err) => {
-            if (err) {
-                return res.status(500).send({ error: "Unable to save user data." });
-            }
-            res.send({ success: true });
-        });
-    });
+        res.send({ success: true });
+    } catch (err) {
+        res.status(500).send({ error: "Unable to delete user data." });
+    }
 };
 
-exports.updateDrinks = (req, res) => {
-    const userId = parseInt(req.params.userId);
-    const { coffees, sodas } = req.body;
+exports.updateDrinks = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const { coffees, sodas } = req.body;
+        const result = await db.collection('users').updateOne(
+            { _id: ObjectID(userId) },
+            { $set: { coffees: coffees, sodas: sodas } }
+        );
 
-    fs.readFile(usersFilePath, 'utf8', (err, data) => {
-        if (err) {
-            return res.status(500).send({ error: 'Unable to read user data.' });
-        }
-
-        const usersData = JSON.parse(data);
-        const user = usersData.users.find(user => user.id === userId);
-
-        if (user) {
-            user.coffees = coffees;
-            user.sodas = sodas;
-
-            fs.writeFile(usersFilePath, JSON.stringify(usersData), (err) => {
-                if (err) {
-                    return res.status(500).send({ error: 'Unable to save user data.' });
-                }
-                res.send({ success: true });
-            });
-        } else {
-            res.status(404).send({ error: 'User not found.' });
-        }
-    });
-};
-
-exports.updateCoffeeSoda = (req, res) => {
-    const userId = req.params.id;
-    const { coffee, soda } = req.body;
-
-    fs.readFile(usersFilePath, 'utf8', (err, data) => {
-        if (err) {
-            return res.status(500).send({ error: 'Unable to read user data.' });
-        }
-
-        const usersData = JSON.parse(data);
-        const userIndex = usersData.users.findIndex(user => user.id === userId);
-
-        if (userIndex === -1) {
+        if (result.matchedCount === 0) {
             return res.status(404).send({ error: 'User not found.' });
         }
+        res.send({ success: true });
+    } catch (err) {
+        res.status(500).send({ error: "Unable to update user data." });
+    }
+};
 
-        usersData.users[userIndex].coffee = coffee;
-        usersData.users[userIndex].soda = soda;
+exports.updateCoffeeSoda = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const { coffee, soda } = req.body;
+        const result = await db.collection('users').updateOne(
+            { _id: ObjectID(userId) },
+            { $set: { coffee: coffee, soda: soda } }
+            );
 
-        fs.writeFile(usersFilePath, JSON.stringify(usersData), (err) => {
-            if (err) {
-                return res.status(500).send({ error: 'Unable to save user data.' });
-            }
-            res.send({ success: true });
-        });
-    });
+        if (result.matchedCount === 0) {
+            return res.status(404).send({ error: 'User not found.' });
+        }
+        res.send({ success: true });
+    } catch (err) {
+        res.status(500).send({ error: "Unable to update user data." });
+    }
 };
 
