@@ -5,7 +5,7 @@ const debug = process.env.DEBUG || false;
 let db = null;
 
 async function connectToDb() {
-    const uri = "mongodb://localhost:27017";
+    const uri = "mongodb://root:rootpassword@db:27017";
     const client = new MongoClient(uri, { useUnifiedTopology: true });
 
     try {
