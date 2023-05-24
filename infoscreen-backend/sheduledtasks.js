@@ -4,7 +4,7 @@ const cron = require('node-cron');
 
 const resetLeaderboard = async () => {
   try {
-    const data = fs.readFileSync(path.resolve(__dirname, './users.json'));
+    const data = fs.readFileSync(path.resolve(__dirname, './data/users.json'));
     const jsonData = JSON.parse(data);
     const users = jsonData.users; // Access the 'users' property of the object
 
@@ -14,7 +14,7 @@ const resetLeaderboard = async () => {
     }
 
     // Write the updated data back to the file
-    fs.writeFileSync(path.resolve(__dirname, './users.json'), JSON.stringify(jsonData, null, 2));
+    fs.writeFileSync(path.resolve(__dirname, './data/users.json'), JSON.stringify(jsonData, null, 2));
     console.log('Successfully reset leaderboard');
   } catch (error) {
     console.error('Error resetting leaderboard:', error);
