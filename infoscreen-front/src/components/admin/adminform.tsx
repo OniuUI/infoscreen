@@ -26,11 +26,16 @@ const AdminForm: React.FC = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/users`);
       const data = await response.json();
-      setUsers(data.users);
+      if (data.users) {
+        setUsers(data.users);
+      } else {
+        console.log("API response does not contain users property. Response:", data);
+      }
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
   };
+
 
   const handleUserChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
     const userId = event.target.value;
