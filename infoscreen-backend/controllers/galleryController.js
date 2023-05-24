@@ -1,3 +1,4 @@
+// galleryController.js
 const path = require('path');
 const fs = require('fs');
 
@@ -9,8 +10,24 @@ exports.getImages = (req, res) => {
       return res.status(500).json({ error: err.message });
     }
     
-    // Assuming your server is running on port 3001
-    const imageFiles = files.map(file => `http://localhost:3001/images/${file}`);
-    res.json(imageFiles);
+    const images = files.map(file => {
+      const filePath = path.join(imageDirectory, file);
+      let stats;
+
+      try {
+        stats = fs.statSync(filePath);
+      } catch (error) {
+        console.error('Unable to read image metadata:', error);
+        return null;
+      }
+
+      return {
+        url: `http://localhost:3001/images/${file}`,
+        created: stats.birthtime,
+        size: stats.size
+      };
+    }).filter(image => image); // Remove any null values due to errors
+
+    res.json(images);
   });
 };
