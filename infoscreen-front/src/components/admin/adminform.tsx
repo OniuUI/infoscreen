@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { API_BASE_URL } from "../../apiConfig"; // Import the API_BASE_URL
 
 interface User {
-  id: string;
+  _id: string;
   firstName: string;
   lastName: string;
   birthdate: string;
@@ -39,7 +39,7 @@ const AdminForm: React.FC = () => {
 
   const handleUserChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
     const userId = event.target.value;
-    const user = users.find((user) => user.id === userId);
+    const user = users.find((user) => user._id === userId);
     if (user) {
       setSelectedUser(user);
       setFirstName(user.firstName);
@@ -59,7 +59,7 @@ const AdminForm: React.FC = () => {
     event.preventDefault();
 
     const user = {
-      id: selectedUser ? selectedUser.id : uuidv4(), // Use the selected user's ID or generate a new one
+      _id: selectedUser ? selectedUser._id : uuidv4(), // Use the selected user's ID or generate a new one
       firstName,
       lastName,
       birthdate,
@@ -69,7 +69,7 @@ const AdminForm: React.FC = () => {
     };
 
     try {
-      const response = await fetch(`${API_BASE_URL}/users${selectedUser ? `/${selectedUser.id}` : ''}`, {
+      const response = await fetch(`${API_BASE_URL}/users${selectedUser ? `/${selectedUser._id}` : ''}`, {
         method: selectedUser ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,14 +93,14 @@ const AdminForm: React.FC = () => {
   const handleDelete = async () => {
     if (!selectedUser) return;
     try {
-      const response = await fetch(`${API_BASE_URL}/users/${selectedUser.id}`, {
+      const response = await fetch(`${API_BASE_URL}/users/${selectedUser._id}`, {
         method: "DELETE",
       });
 
       const data = await response.json();
       if (data.success) {
         alert("User deleted successfully!");
-        setUsers(users.filter(user => user.id !== selectedUser.id));
+        setUsers(users.filter(user => user._id !== selectedUser._id));
         setSelectedUser(null);
       } else {
         alert("Failed to delete user. Please try again.");
@@ -117,10 +117,10 @@ const AdminForm: React.FC = () => {
       <form onSubmit={handleSubmit} className="admin-form">
         <label>
           Select User:
-          <select onChange={handleUserChange} value={selectedUser?.id || ""}>
+          <select onChange={handleUserChange} value={selectedUser?._id || ""}>
             <option value="">New User</option>
             {users.map((user) => (
-              <option key={user.id} value={user.id}>
+              <option key={user._id} value={user._id}>
                 {user.firstName} {user.lastName}
               </option>
               ))}

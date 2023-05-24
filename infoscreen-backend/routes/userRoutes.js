@@ -5,7 +5,7 @@ const userController = require('../controllers/userController');
 
 const router = express.Router();
 
-const usersFilePath = path.join(__dirname, "users.json");
+//const usersFilePath = path.join(__dirname, "users.json");
 
 router.get('/', userController.getAllUsers);
 router.post('/', userController.addUser);

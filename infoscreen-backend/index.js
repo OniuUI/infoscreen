@@ -36,13 +36,17 @@ app.use(limiter);
 
 const PORT = process.env.PORT || 3001;
 // Establish DB connection
-connectToDb().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+connectToDb()
+  .then(() => {
+    app.use('/users', userRoutes);
+
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Error while connecting to the database:', err);
   });
-}).catch(err => {
-  console.error('Error while connecting to the database:', err);
-})
 
 // Middleware blocking for MongoDB
 app.use(async (req, res, next) => {
@@ -53,7 +57,6 @@ app.use(async (req, res, next) => {
   next();
 });
 
-app.use('/users', userRoutes);
 app.use('/events', eventRoutes);
 app.use('/rss', rssRoutes);
 
