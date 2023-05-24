@@ -1,92 +1,54 @@
-const fs = require('fs');
-const path = require('path');
+const getDb = require('../db').getDb;
+const { ObjectId } = require('mongodb');
 const { removePastEvents } = require('../utils');
 
-const eventsFilePath = path.join(__dirname, "../data/events.json");
-
-exports.getAllEvents = (req, res) => {
-    removePastEvents();
-    fs.readFile(eventsFilePath, "utf8", (err, data) => {
-        if (err) {
-            return res.status(500).send({ error: "Unable to read event data." });
-        }
-
-        const events = JSON.parse(data);
+exports.getAllEvents = async (req, res) => {
+    try {
+        removePastEvents();
+        const db = getDb();
+        const events = await db.collection('events').find().toArray();
         res.send(events);
-    });
+    } catch (err) {
+        res.status(500).send({ error: "Unable to read event data."});
+    }
 };
 
-exports.addEvent = (req, res) => {
-    const newEvent = req.body;
-
-    fs.readFile(eventsFilePath, "utf8", (err, data) => {
-        if (err) {
-            return res.status(500).send({ error: "Unable to read event data." });
-        }
-
-        const eventsData = JSON.parse(data);
-        eventsData.events.push(newEvent);
-
-        fs.writeFile(eventsFilePath, JSON.stringify(eventsData), (err) => {
-            if (err) {
-                return res.status(500).send({ error: "Unable to save event data." });
-            }
-            res.send({ success: true });
-        });
-    });
+exports.addEvent = async (req, res) => {
+    try {
+        const db = getDb();
+        const newEvent = req.body;
+        const result = await db.collection('events').insertOne(newEvent);
+        res.send({ success: true });
+    } catch (err) {
+        res.status(500).send({ error: "Unable to save event data."});
+    }
 };
 
-exports.updateEvent = (req, res) => {
-    const updatedEvent = req.body;
-    const eventId = req.params.id;
-
-    fs.readFile(eventsFilePath, "utf8", (err, data) => {
-        if (err) {
-            return res.status(500).send({ error: "Unable to read event data." });
-        }
-
-        const eventsData = JSON.parse(data);
-        const eventIndex = eventsData.events.findIndex(event => event.id === eventId);
-
-        if (eventIndex === -1) {
+exports.updateEvent = async (req, res) => {
+    try {
+        const db = getDb();
+        const eventId = req.params.id;
+        const updatedEvent = req.body;
+        const result = await db.collection('events').replaceOne({ _id: ObjectId(eventId) }, updatedEvent);
+        if (result.matchedCount === 0) {
             return res.status(404).send({ error: 'Event not found.' });
         }
-
-        // Update the event's data
-        eventsData.events[eventIndex] = updatedEvent;
-
-        fs.writeFile(eventsFilePath, JSON.stringify(eventsData), (err) => {
-            if (err) {
-                return res.status(500).send({ error: "Unable to save event data." });
-            }
-            res.send({ success: true });
-        });
-    });
+        res.send({ success: true });
+    } catch (err) {
+        res.status(500).send({ error: "Unable to update event data."});
+    }
 };
 
-exports.deleteEvent = (req, res) => {
-    const eventId = req.params.id;
-
-    fs.readFile(eventsFilePath, "utf8", (err, data) => {
-        if (err) {
-            return res.status(500).send({ error: "Unable to read event data." });
-        }
-
-        const eventsData = JSON.parse(data);
-        const eventIndex = eventsData.events.findIndex(event => event.id === eventId);
-
-        if (eventIndex === -1) {
+exports.deleteEvent = async (req, res) => {
+    try {
+        const db = getDb();
+        const eventId = req.params.id;
+        const result = await db.collection('events').deleteOne({ _id: ObjectId(eventId) });
+        if (result.deletedCount === 0) {
             return res.status(404).send({ error: 'Event not found.' });
         }
-
-        // Remove the event from the array
-        eventsData.events.splice(eventIndex, 1);
-
-        fs.writeFile(eventsFilePath, JSON.stringify(eventsData), (err) => {
-            if (err) {
-                return res.status(500).send({ error: "Unable to save event data." });
-            }
-            res.send({ success: true });
-        });
-    });
+        res.send({ success: true });
+    } catch (err) {
+        res.status(500).send({ error: "Unable to delete event data."});
+    }
 };

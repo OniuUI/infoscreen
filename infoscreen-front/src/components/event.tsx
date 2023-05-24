@@ -3,6 +3,7 @@ import { API_BASE_URL } from "../apiConfig"; // Import the API_BASE_URL
 import NoEvents from './img/noevents.svg'; // Import your SVG image
 
 interface EventInterface {
+  _id: string;
   eventName: string;
   eventDate: string;
   daysToEvent?: number;
@@ -27,7 +28,7 @@ const Event: React.FC = () => {
         let data = await response.json();
 
         // Add daysToEvent to each event
-        data = data.events.map((event: EventInterface) => ({
+        data = data.map((event: EventInterface) => ({
           ...event,
           daysToEvent: calculateDaysToEvent(event.eventDate),
         }));
@@ -50,10 +51,10 @@ const Event: React.FC = () => {
   return (
     <div className={'event-container'}>
       {events.length > 0 ?
-        events.map((event, index) => {
+        events.map((event) => {
           const daysToEventText = event.daysToEvent === 0 ? 'Today' : `Days to event: ${event.daysToEvent}`;
           return (
-            <div key={index} className={"event"}>
+            <div key={event._id} className={"event"}>
               <h3>{event.eventName}</h3>
               <div className="event-details">
                 <p>Date: {event.eventDate}</p>

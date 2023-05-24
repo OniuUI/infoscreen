@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { API_BASE_URL } from "../../apiConfig";
 
 interface Event {
-  id: string;
+  _id: string;
   eventName: string;
   eventDate: string;
 }
@@ -13,24 +13,39 @@ const EventForm: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [eventName, setEventName] = useState("");
   const [eventDate, setEventDate] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<'loading' | 'error' | 'success'>('success');
 
   useEffect(() => {
     fetchEvents();
-  }, []);
+    }, []);
 
   const fetchEvents = async () => {
+    setLoading(true);
+    setStatus('loading');
     try {
       const response = await fetch(`${API_BASE_URL}/events`);
       const data = await response.json();
-      setEvents(data.events);
-    } catch (error) {
+      if (data) {
+        setEvents(data);
+        setStatus('success');
+      } else {
+        setError('No events found');
+        setStatus('error');
+      }
+      setLoading(false);
+    } catch (error: any) {
+      setError(error.message);
+      setLoading(false);
+      setStatus('error');
       console.error("Error fetching events data:", error);
     }
   };
 
   const handleEventChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
     const eventId = event.target.value;
-    const foundEvent = events.find((event) => event.id === eventId);
+    const foundEvent = events.find((event) => event._id === eventId);
     if (foundEvent) {
       setSelectedEvent(foundEvent);
       setEventName(foundEvent.eventName);
@@ -46,13 +61,13 @@ const EventForm: React.FC = () => {
     event.preventDefault();
 
     const eventObj = {
-      id: selectedEvent ? selectedEvent.id : uuidv4(),
+      _id: selectedEvent ? selectedEvent._id : uuidv4(),
       eventName,
       eventDate,
     };
 
     try {
-      await fetch(`${API_BASE_URL}/events${selectedEvent ? `/${selectedEvent.id}` : ''}`, {
+      await fetch(`${API_BASE_URL}/events${selectedEvent ? `/${selectedEvent._id}` : ''}`, {
         method: selectedEvent ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
@@ -70,11 +85,11 @@ const EventForm: React.FC = () => {
   const handleDelete = async () => {
     if (selectedEvent) {
       try {
-        await fetch(`${API_BASE_URL}/events/${selectedEvent.id}`, {
+        await fetch(`${API_BASE_URL}/events/${selectedEvent._id}`, {
           method: "DELETE",
         });
         alert("Event deleted successfully!");
-        setEvents(events.filter(event => event.id !== selectedEvent.id));
+        setEvents(events.filter(event => event._id !== selectedEvent._id));
         setSelectedEvent(null);
         setEventName("");
         setEventDate("");
@@ -88,13 +103,15 @@ const EventForm: React.FC = () => {
   return (
     <div className="form-container">
       <h1>{selectedEvent ? "Edit Event" : "Add Event"}</h1>
+      {status === 'loading' && <p>Loading...</p>}
+      {status === 'error' && <p>Error: {error}</p>}
       <form onSubmit={handleSubmit} className="event-form">
         <label>
           Select Event:
-          <select onChange={handleEventChange} value={selectedEvent?.id || ""}>
+          <select onChange={handleEventChange} value={selectedEvent?._id || ""}>
             <option value="">New Event</option>
-            {events.map((event) => (
-              <option key={event.id} value={event.id}>
+            {status === 'success' && events.map((event) => (
+              <option key={event._id} value={event._id}>
                 {event.eventName} - {new Date(event.eventDate).toLocaleDateString()}
               </option>
               ))}
@@ -130,5 +147,3 @@ const EventForm: React.FC = () => {
 };
 
 export default EventForm;
-
-
