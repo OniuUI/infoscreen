@@ -11,17 +11,22 @@ const Thirsty: React.FC = () => {
       try {
         const response = await fetch(`${API_BASE_URL}/users`);
         const data = await response.json();
-        setUsers(data.users);
+        const users = data.users.map((user: any) => ({
+          ...user,
+          coffee: user.coffee || 0,
+          soda: user.soda || 0,
+        }));
+        setUsers(users);
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
     };
 
     fetchUsers();
-  }, []);
+    }, []);
 
   const updateThirst = (userId: string, type: 'coffee' | 'soda', action: 'add' | 'subtract') => {
-      const userIndex = users.findIndex((user) => user.id === userId);
+      const userIndex = users.findIndex((user) => user._id === userId);
       const updatedUsers = [...users];
       if (action === 'add') {
           updatedUsers[userIndex][type]++;
@@ -51,26 +56,24 @@ const Thirsty: React.FC = () => {
 };
  
 
- // ...other code
-
   return (
     <div className="thirsty">
       <div className="thirsty-masthead">
         <img src={thirstylogo} alt="Thirsty" />
       </div>
       {users.map((user) => (
-        <div className="user-card" key={user.id}>
+        <div className="user-card" key={user._id}>
           <Person {...user} />
           <div className="user-actions">
             <div>
               <p>Coffee: {user.coffee}</p>
-              <button onClick={() => updateThirst(user.id, 'coffee', 'add')}>Add Coffee</button>
-              <button onClick={() => updateThirst(user.id, 'coffee', 'subtract')}>Subtract Coffee</button>
+              <button onClick={() => updateThirst(user._id, 'coffee', 'add')}>Add Coffee</button>
+              <button onClick={() => updateThirst(user._id, 'coffee', 'subtract')}>Subtract Coffee</button>
             </div>
             <div>
               <p>Soda: {user.soda}</p>
-              <button onClick={() => updateThirst(user.id, 'soda', 'add')}>Add Soda</button>
-              <button onClick={() => updateThirst(user.id, 'soda', 'subtract')}>Subtract Soda</button>
+              <button onClick={() => updateThirst(user._id, 'soda', 'add')}>Add Soda</button>
+              <button onClick={() => updateThirst(user._id, 'soda', 'subtract')}>Subtract Soda</button>
             </div>
           </div>
         </div>
@@ -78,7 +81,6 @@ const Thirsty: React.FC = () => {
     </div>
     );
 
-  // ...other code
 
 };
 
