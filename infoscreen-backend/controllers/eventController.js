@@ -1,5 +1,4 @@
 const getDb = require('../db').getDb;
-const { ObjectId } = require('mongodb');
 const { removePastEvents } = require('../utils');
 
 exports.getAllEvents = async (req, res) => {
@@ -29,7 +28,7 @@ exports.updateEvent = async (req, res) => {
         const db = getDb();
         const eventId = req.params.id;
         const updatedEvent = req.body;
-        const result = await db.collection('events').replaceOne({ _id: ObjectId(eventId) }, updatedEvent);
+        const result = await db.collection('events').replaceOne({ _id: eventId }, updatedEvent);
         if (result.matchedCount === 0) {
             return res.status(404).send({ error: 'Event not found.' });
         }
@@ -43,7 +42,7 @@ exports.deleteEvent = async (req, res) => {
     try {
         const db = getDb();
         const eventId = req.params.id;
-        const result = await db.collection('events').deleteOne({ _id: ObjectId(eventId) });
+        const result = await db.collection('events').deleteOne({ _id: eventId });
         if (result.deletedCount === 0) {
             return res.status(404).send({ error: 'Event not found.' });
         }
