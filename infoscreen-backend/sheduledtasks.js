@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const cron = require('node-cron');
-const getDb = require('../db').getDb;
+const getDb = require('./db').getDb;
 
 const resetLeaderboard = async () => {
   try {
