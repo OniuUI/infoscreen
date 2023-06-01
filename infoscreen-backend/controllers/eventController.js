@@ -3,7 +3,7 @@ const { removePastEvents } = require('../utils');
 
 exports.getAllEvents = async (req, res) => {
     try {
-        removePastEvents();
+        await removePastEvents(); // Waits for past events to be wiped, on event load.
         const db = getDb();
         const events = await db.collection('events').find().toArray();
         res.send(events);
