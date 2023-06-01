@@ -1,33 +1,47 @@
 // galleryController.js
-const path = require('path');
-const fs = require('fs');
+const getDb = require('../db').getDb;
 
-exports.getImages = (req, res) => {
-  const imageDirectory = path.join(__dirname, '../data/images');
-  
-  fs.readdir(imageDirectory, (err, files) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
+exports.getImages = async (req, res) => {
+  try {
+    const db = getDb();
+    const images = await db.collection('images').find().toArray();
+
+    if (images.length > 0) {
+      res.json(images);
+    } else {
+      res.status(404).send({ error: "No images found." });
     }
-    
-    const images = files.map(file => {
-      const filePath = path.join(imageDirectory, file);
-      let stats;
-
-      try {
-        stats = fs.statSync(filePath);
-      } catch (error) {
-        console.error('Unable to read image metadata:', error);
-        return null;
-      }
-
-      return {
-        url: `http://localhost:3001/images/${file}`,
-        created: stats.birthtime,
-        size: stats.size
-      };
-    }).filter(image => image); // Remove any null values due to errors
-
-    res.json(images);
-  });
+  } catch (err) {
+    res.status(500).json({ error: "Unable to read image data." });
+  }
 };
+
+
+exports.addImage = async (req, res) => {
+  const { userId, firstName, lastName, dateUploaded, imageName, base64Image } = req.body;
+
+  // Validation to ensure all necessary data is present
+  if (!userId || !firstName || !lastName || !dateUploaded || !imageName || !base64Image) {
+    return res.status(400).json({ error: "Missing required image data." });
+  }
+
+  try {
+    const db = getDb();
+    const image = {
+      userId,
+      firstName,
+      lastName,
+      dateUploaded: new Date(dateUploaded), // ensure date is stored as a Date object
+      imageName,
+      base64Image
+    };
+
+    await db.collection('images').insertOne(image);
+
+    res.status(201).json({ message: "Image successfully uploaded." });
+  } catch (err) {
+    console.error('Unable to upload image:', err);
+    res.status(500).json({ error: "Unable to upload image." });
+  }
+};
+

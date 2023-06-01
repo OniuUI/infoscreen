@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require("express");
+const bodyParser = require('body-parser');
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");
 const path = require('path');
@@ -8,11 +9,16 @@ const { scheduleResetLeaderboard } = require('./sheduledtasks');
 
 const userRoutes = require('./routes/userRoutes');
 const eventRoutes = require('./routes/eventRoutes');
+const galleryRouter = require('./routes/galleryRoutes');
 const rssRoutes = require('./routes/rssRoutes');
 
 
 
 const app = express();
+
+// Body parser, sets maximum body payload limit to 50MB
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true, parameterLimit:50000 }));
 
 
 // Enable rate limiting
@@ -29,7 +35,10 @@ app.use(express.json());
 // Server startup events.
 scheduleResetLeaderboard();
 
-// Apply the rate limiter to all requests
+
+
+
+// Apply the rate limiter to all requests.
 app.use(limiter);
 
 
@@ -59,4 +68,5 @@ app.use(async (req, res, next) => {
 
 app.use('/events', eventRoutes);
 app.use('/rss', rssRoutes);
+app.use('/gallery', galleryRouter);
 

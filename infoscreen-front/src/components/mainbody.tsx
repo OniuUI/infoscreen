@@ -29,7 +29,10 @@ const Container: React.FC = () => {
                 <main>
                     <div className="grid">
                         <SquareField>
-                             <Event />
+                            <Carousel interval={420000}>
+                                <Gallery />
+                                <Event />
+                            </Carousel>
                         </SquareField>
                         <SquareField>
                              <CurrentTime />

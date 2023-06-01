@@ -2,6 +2,7 @@
 import React from 'react';
 import AdminForm from "./adminform";
 import EventForm from "./eventform";
+import ImageForm from "./imageform";
 
 const Admin: React.FC = () => {
     return (
@@ -9,6 +10,7 @@ const Admin: React.FC = () => {
             <h1>Admin Page</h1>
             <AdminForm/>
             <EventForm/>
+            <ImageForm/>
         </div>
         );
 };

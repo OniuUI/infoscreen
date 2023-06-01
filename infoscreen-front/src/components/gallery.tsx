@@ -1,32 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { API_BASE_URL } from "../apiConfig"; // Import the API_BASE_URL
+import { API_BASE_URL } from "../apiConfig";
+import '../components/css/gallery.css'; // Import the CSS file
+
+interface ImageData {
+  base64Image: string;
+}
 
 const Gallery = () => {
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Fetch images from server on component mount
   useEffect(() => {
-      fetch(`${API_BASE_URL}/images`)
+    fetch(`${API_BASE_URL}/gallery`)
       .then(res => res.json())
-      .then(setImages)
+      .then((data: ImageData[]) => setImages(data.map((image: ImageData) => `data:image/jpeg;base64,${image.base64Image}`)))
       .catch(console.error);
   }, []);
 
-  // Change image every 3 seconds
   useEffect(() => {
     const intervalId = setInterval(() => {
       setCurrentIndex((currentIndex + 1) % images.length);
     }, 3000);
-    return () => clearInterval(intervalId); // Clear on unmount
+
+    return () => clearInterval(intervalId);
   }, [currentIndex, images.length]);
 
-  // Render current image
-  return images.length > 0 ? (
-    <img src={images[currentIndex]} alt="Slideshow" />
-  ) : (
-    <p>Loading...</p>
-  );
+  return (
+    <div className="slideshow-container">
+      {images.map((image, index) => (
+        <img
+          className={`slide ${currentIndex === index ? 'active' : ''}`}
+          src={image}
+          alt={`Slide ${index + 1}`}
+          key={index}
+        />
+      ))}
+    </div>
+    );
 };
 
 export default Gallery;
