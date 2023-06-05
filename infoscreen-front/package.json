@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-tailwind/react": "^2.0.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -16,6 +17,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-flip-move": "^3.0.5",
+    "react-lottie": "^1.2.3",
     "react-router-dom": "^6.11.1",
     "react-scripts": "5.0.1",
     "rss-parser": "^3.13.0",
@@ -48,6 +50,7 @@
     ]
   },
   "devDependencies": {
+    "@types/react-lottie": "^1.2.6",
     "@types/uuid": "^9.0.1"
   }
 }
