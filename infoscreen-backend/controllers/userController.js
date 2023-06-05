@@ -49,6 +49,22 @@ exports.addUser = async (req, res) => {
   }
 };
 
+exports.getUserById = async (id) => {
+    try {
+        const db = getDb();
+        const user = await db.collection('users').findOne({ _id: id });
+
+        if (!user) {
+            throw new Error('User not found.');
+        }
+
+        return user;
+    } catch (err) {
+        throw new Error('Unable to fetch user data.');
+    }
+};
+
+
 exports.updateUser = async (req, res) => {
   try {
     const db = getDb();

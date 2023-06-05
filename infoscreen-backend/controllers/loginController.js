@@ -41,7 +41,7 @@ exports.login = async (req, res) => {
 };
 
 exports.refreshToken = async (req, res) => {
-    const { token } = req.body;
+    const token  = req.body.token;
 
     if (!token) {
         return res.sendStatus(401);
@@ -49,20 +49,21 @@ exports.refreshToken = async (req, res) => {
 
     try {
         const payload = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
-        const user = await userController.getUser(payload.userId);
+        const user = await userController.getUserById(payload.userId);
 
-        // Validate refreshToken with the one in the database
+
         if (token !== user.refreshToken) {
             return res.sendStatus(403);
         }
 
         const accessToken = generateAccessToken(user._id);
-        res.json({ accessToken }); // Just return the new accessToken
+        res.json({ accessToken });
     } catch (err) {
         if (err instanceof jwt.JsonWebTokenError) {
-            res.sendStatus(403);
+            return res.sendStatus(403);
         } else {
-            res.sendStatus(400);
+            console.log(err);
+            return res.sendStatus(400);
         }
     }
 };
