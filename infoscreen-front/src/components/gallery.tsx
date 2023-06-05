@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { API_BASE_URL } from "../apiConfig";
+import {apiService} from "./api/apiservice";
 import '../components/css/gallery.css'; // Import the CSS file
 
 interface ImageData {
@@ -11,8 +11,7 @@ const Gallery = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/gallery`)
-      .then(res => res.json())
+    apiService.get(`/gallery`)
       .then((data: ImageData[]) => setImages(data.map((image: ImageData) => `data:image/jpeg;base64,${image.base64Image}`)))
       .catch(console.error);
   }, []);

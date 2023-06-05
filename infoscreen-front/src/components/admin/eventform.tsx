@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from 'uuid';
-import { API_BASE_URL } from "../../apiConfig";
+import {apiService} from "../api/apiservice";
 
 interface Event {
   _id: string;
@@ -25,8 +25,7 @@ const EventForm: React.FC = () => {
     setLoading(true);
     setStatus('loading');
     try {
-      const response = await fetch(`${API_BASE_URL}/events`);
-      const data = await response.json();
+      const data = await apiService.get(`/events`);
       if (data) {
         setEvents(data);
         setStatus('success');
@@ -57,7 +56,7 @@ const EventForm: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const eventObj = {
@@ -67,27 +66,24 @@ const EventForm: React.FC = () => {
     };
 
     try {
-      await fetch(`${API_BASE_URL}/events${selectedEvent ? `/${selectedEvent._id}` : ''}`, {
-        method: selectedEvent ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(eventObj),
-      });
+      if (selectedEvent) {
+        await apiService.put(`/events/${selectedEvent._id}`, eventObj);
+      } else {
+        await apiService.post(`/events`, eventObj);
+      }
+
       alert(selectedEvent ? "Event updated successfully!" : "Event added successfully!");
       fetchEvents();
     } catch (error) {
       console.error("Error updating event:", error);
       alert("Failed to update event. Please try again.");
     }
-  };
+};
 
-  const handleDelete = async () => {
+const handleDelete = async () => {
     if (selectedEvent) {
       try {
-        await fetch(`${API_BASE_URL}/events/${selectedEvent._id}`, {
-          method: "DELETE",
-        });
+        await apiService.delete(`/events/${selectedEvent._id}`);
         alert("Event deleted successfully!");
         setEvents(events.filter(event => event._id !== selectedEvent._id));
         setSelectedEvent(null);
@@ -98,7 +94,7 @@ const EventForm: React.FC = () => {
         alert("Failed to delete event. Please try again.");
       }
     }
-  };
+};
 
   return (
     <div className="form-container">

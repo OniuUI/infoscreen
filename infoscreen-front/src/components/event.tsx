@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { API_BASE_URL } from "../apiConfig"; // Import the API_BASE_URL
+import {apiService} from "./api/apiservice";
 import NoEvents from './img/noevents.svg'; // Import your SVG image
 
 interface EventInterface {
@@ -24,7 +24,7 @@ const Event: React.FC = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/events`);
+        const response = await apiService.get(`/events`);
         let data = await response.json();
 
         // Add daysToEvent to each event

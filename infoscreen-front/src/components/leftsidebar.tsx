@@ -1,7 +1,7 @@
 // src/components/LeftSidebar.tsx
 import React, { useState, useEffect } from "react";
 import Person from "./person";
-import { API_BASE_URL } from "../apiConfig"; // Import the API_BASE_URL
+import {apiService} from "./api/apiservice"; // Import the API_BASE_URL
 
 interface User {
   firstName: string;
@@ -38,8 +38,7 @@ const LeftSidebar: React.FC = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/users`);
-        let data = await response.json();
+        let data = await apiService.get(`/users`);
 
         // Add daysToBirthday to each user
         data = data.users.map((user: User) => ({

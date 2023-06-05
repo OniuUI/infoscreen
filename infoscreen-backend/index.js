@@ -6,6 +6,7 @@ const rateLimit = require("express-rate-limit");
 const path = require('path');
 const { connectToDb, getDb } = require('./db');
 const { scheduleResetLeaderboard } = require('./sheduledtasks');
+const  verifyAccessToken  = require('./security/validation')
 
 const userRoutes = require('./routes/userRoutes');
 const eventRoutes = require('./routes/eventRoutes');
@@ -48,7 +49,7 @@ const PORT = process.env.PORT || 3001;
 // Establish DB connection
 connectToDb()
   .then(() => {
-    app.use('/users', userRoutes);
+    app.use('/api/users', verifyAccessToken, userRoutes);
 
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
@@ -67,8 +68,12 @@ app.use(async (req, res, next) => {
   next();
 });
 
-app.use('/events', eventRoutes);
-app.use('/rss', rssRoutes);
-app.use('/gallery', galleryRouter);
-app.use('/login', loginRoutes);
+// Unsecure routes
+app.use('/api/login', loginRoutes);
+
+//Secured paths
+app.use('/api/events', verifyAccessToken, eventRoutes);
+app.use('/api/rss', verifyAccessToken, rssRoutes);
+app.use('/api/gallery', verifyAccessToken, galleryRouter);
+
 

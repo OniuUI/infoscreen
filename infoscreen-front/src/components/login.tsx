@@ -19,6 +19,7 @@ const Login = () => {
             if (response.data) {
                 localStorage.setItem('accessToken', response.data.accessToken);
                 localStorage.setItem('refreshToken', response.data.refreshToken);
+                localStorage.setItem('userIdent', response.data.userIdent)
                 console.log("Authenticated");
             }
         } catch (error) {

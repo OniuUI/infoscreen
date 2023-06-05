@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from 'uuid';
-import { API_BASE_URL } from "../../apiConfig";
+import {apiService} from "../api/apiservice";
 
 interface User {
     _id: string;
@@ -20,8 +20,7 @@ const ImageForm: React.FC = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/users`);
-            const data = await response.json();
+            const data = await apiService.get(`/users`);
             if (data.users) {
                 setUsers(data.users);
             } else {
@@ -55,13 +54,7 @@ const ImageForm: React.FC = () => {
         };
 
         try {
-            const response = await fetch(`${API_BASE_URL}/gallery`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(imageObj),
-            });
+            const response = await apiService.get(`/gallery`);
 
             if (response.ok) {
                 alert("Image added successfully!");

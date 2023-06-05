@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RSSItem } from './interfaces';
 import { RSSFeed } from './interfaces';
-import { API_BASE_URL } from '../apiConfig';
+import {apiService} from "./api/apiservice";
 import './css/newsfeed.css';
 
 const Newsfeed: React.FC = () => {
@@ -10,7 +10,7 @@ const Newsfeed: React.FC = () => {
   useEffect(() => {
     const fetchNewsfeed = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/rss`);
+        const response = await apiService.get(`/rss`);
         const data: RSSFeed = await response.json();
 
         setFeed(

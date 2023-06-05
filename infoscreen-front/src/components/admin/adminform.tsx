@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { API_BASE_URL } from "../../apiConfig";
+import {apiService} from "../api/apiservice";
 
 interface User {
   _id: string;
@@ -28,8 +29,7 @@ const AdminForm: React.FC = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/users`);
-      const data = await response.json();
+      const data = await apiService.get(`/users`);
       if (data.users) {
         setUsers(data.users);
       } else {
@@ -55,6 +55,7 @@ const AdminForm: React.FC = () => {
       setLastName(user.lastName);
       setBirthdate(user.birthdate);
       setImageUrl(user.imageUrl);
+      setEmail(user.email);
       setPassword("");
     } else {
       setSelectedUser(null);
@@ -62,6 +63,7 @@ const AdminForm: React.FC = () => {
       setLastName("");
       setBirthdate("");
       setImageUrl("");
+      setEmail("");
       setPassword("");
     }
   };
@@ -70,10 +72,10 @@ const AdminForm: React.FC = () => {
     event.preventDefault();
 
     const user = {
-      _id: selectedUser ? selectedUser._id : uuidv4(), // Use the selected user's ID or generate a new one
+      _id: selectedUser ? selectedUser._id : uuidv4(),
       firstName,
       lastName,
-      email, // Add email to the user object
+      email,
       birthdate,
       imageUrl,
       password,
@@ -82,18 +84,11 @@ const AdminForm: React.FC = () => {
     };
 
     try {
-      const response = await fetch(`${API_BASE_URL}/users${selectedUser ? `/${selectedUser._id}` : ''}`, {
-        method: selectedUser ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(user),
-      });
+      const data = await apiService[selectedUser ? "put" : "post"](`/users${selectedUser ? `/${selectedUser._id}` : ''}`, user);
 
-      const data = await response.json();
       if (data.success) {
         alert(selectedUser ? "User updated successfully!" : "User added successfully!");
-        fetchUsers();
+        await fetchUsers();
       } else {
         alert("Failed to update user. Please try again.");
       }
@@ -103,14 +98,14 @@ const AdminForm: React.FC = () => {
     }
   };
 
+
   const handleDelete = async () => {
     if (!selectedUser) return;
     try {
-      const response = await fetch(`${API_BASE_URL}/users/${selectedUser._id}`, {
-        method: "DELETE",
-      });
+      const data = await apiService.delete(`/users/${selectedUser._id}`);
 
-      const data = await response.json();
+
+
       if (data.success) {
         alert("User deleted successfully!");
         setUsers(users.filter(user => user._id !== selectedUser._id));

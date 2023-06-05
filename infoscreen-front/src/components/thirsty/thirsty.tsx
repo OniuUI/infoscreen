@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Person from '../person';
-import { API_BASE_URL } from "../../apiConfig"; // Import the API_BASE_URL
+
+import {apiService} from "../api/apiservice";
 import thirstylogo from '../img/thirsty.svg';
 
 const Thirsty: React.FC = () => {
@@ -9,8 +10,7 @@ const Thirsty: React.FC = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/users`);
-        const data = await response.json();
+        const data = await apiService.get(`/users`);
         const users = data.users.map((user: any) => ({
           ...user,
           coffee: user.coffee || 0,
@@ -26,35 +26,28 @@ const Thirsty: React.FC = () => {
     }, []);
 
   const updateThirst = (userId: string, type: 'coffee' | 'soda', action: 'add' | 'subtract') => {
-      const userIndex = users.findIndex((user) => user._id === userId);
-      const updatedUsers = [...users];
-      if (action === 'add') {
-          updatedUsers[userIndex][type]++;
-      } else {
-          updatedUsers[userIndex][type] = Math.max(0, updatedUsers[userIndex][type] - 1);
-      }
-      setUsers(updatedUsers);
-      handleUpdateUser(userId, updatedUsers[userIndex].coffee, updatedUsers[userIndex].soda);
-  };
-  
- const handleUpdateUser = async (userId: string, coffee: number, soda: number) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/users/${userId}/coffee-soda`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ coffee, soda }),
-    });
-
-    if (!response.ok) {
-      console.error('Error updating user data:', response.statusText);
+    const userIndex = users.findIndex((user) => user._id === userId);
+    const updatedUsers = [...users];
+    if (action === 'add') {
+      updatedUsers[userIndex][type]++;
+    } else {
+      updatedUsers[userIndex][type] = Math.max(0, updatedUsers[userIndex][type] - 1);
     }
-  } catch (error) {
-    console.error('Error updating user data:', error);
-  }
-};
- 
+    setUsers(updatedUsers);
+    handleUpdateUser(userId, updatedUsers[userIndex].coffee, updatedUsers[userIndex].soda);
+  };
+
+  const handleUpdateUser = async (userId: string, coffee: number, soda: number) => {
+    try {
+      const response = await apiService.put(`/users/${userId}/coffee-soda`, { coffee, soda });
+
+      if (!response.ok) {
+        console.error('Error updating user data:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error updating user data:', error);
+    }
+  };
 
   return (
     <div className="thirsty">

@@ -26,6 +26,8 @@ exports.login = async (req, res) => {
     // Create tokens
     const accessToken = generateAccessToken(user._id);
     const refreshToken = jwt.sign({ userId: user._id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
+    const userIdent = user._id;
+
 
     // Update user with refreshToken
     user.refreshToken = refreshToken;
@@ -34,6 +36,7 @@ exports.login = async (req, res) => {
     res.send({
         accessToken,
         refreshToken,
+        userIdent,
     });
 };
 
@@ -54,14 +57,7 @@ exports.refreshToken = async (req, res) => {
         }
 
         const accessToken = generateAccessToken(user._id);
-        const newRefreshToken = jwt.sign({ userId: user._id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
-
-        // Update user with new refreshToken
-        user.refreshToken = newRefreshToken;
-        await userController.updateUser(user);
-
-        res.json({ accessToken, refreshToken: newRefreshToken });
-
+        res.json({ accessToken }); // Just return the new accessToken
     } catch (err) {
         if (err instanceof jwt.JsonWebTokenError) {
             res.sendStatus(403);
@@ -70,6 +66,7 @@ exports.refreshToken = async (req, res) => {
         }
     }
 };
+
 
 exports.logout = async (req, res) => {
     try {
