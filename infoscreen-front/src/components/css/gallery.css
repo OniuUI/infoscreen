@@ -3,7 +3,7 @@
 .slideshow-container {
     position: relative;
     width: 100%;
-    height: 400px; /* Set a static size */
+    height: 100%; /* Set a static size */
   overflow: hidden;
 }
 

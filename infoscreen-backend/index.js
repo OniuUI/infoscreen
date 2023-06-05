@@ -11,6 +11,7 @@ const userRoutes = require('./routes/userRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const galleryRouter = require('./routes/galleryRoutes');
 const rssRoutes = require('./routes/rssRoutes');
+const loginRoutes = require('./routes/loginRoutes');
 
 
 
@@ -69,4 +70,5 @@ app.use(async (req, res, next) => {
 app.use('/events', eventRoutes);
 app.use('/rss', rssRoutes);
 app.use('/gallery', galleryRouter);
+app.use('/login', loginRoutes);
 

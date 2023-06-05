@@ -1,26 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from 'uuid';
-import { API_BASE_URL } from "../../apiConfig"; // Import the API_BASE_URL
+import { API_BASE_URL } from "../../apiConfig";
 
 interface User {
   _id: string;
   firstName: string;
   lastName: string;
+  email: string;
   birthdate: string;
   imageUrl: string;
+  password: string;
 }
 
 const AdminForm: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [email, setEmail]= useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [birthdate, setBirthdate] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+    }, []);
 
   const fetchUsers = async () => {
     try {
@@ -37,6 +41,11 @@ const AdminForm: React.FC = () => {
   };
 
 
+  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value)
+  };
+
+
   const handleUserChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
     const userId = event.target.value;
     const user = users.find((user) => user._id === userId);
@@ -46,12 +55,14 @@ const AdminForm: React.FC = () => {
       setLastName(user.lastName);
       setBirthdate(user.birthdate);
       setImageUrl(user.imageUrl);
+      setPassword("");
     } else {
       setSelectedUser(null);
       setFirstName("");
       setLastName("");
       setBirthdate("");
       setImageUrl("");
+      setPassword("");
     }
   };
 
@@ -62,8 +73,10 @@ const AdminForm: React.FC = () => {
       _id: selectedUser ? selectedUser._id : uuidv4(), // Use the selected user's ID or generate a new one
       firstName,
       lastName,
+      email, // Add email to the user object
       birthdate,
       imageUrl,
+      password,
       coffee: 0,
       soda: 0,
     };
@@ -123,7 +136,7 @@ const AdminForm: React.FC = () => {
               <option key={user._id} value={user._id}>
                 {user.firstName} {user.lastName}
               </option>
-              ))}
+            ))}
           </select>
         </label>
         <label>
@@ -166,12 +179,31 @@ const AdminForm: React.FC = () => {
             className="form-input"
           />
         </label>
+        <label>
+          Email:
+          <input
+            type="email"
+            value={email}
+            onChange={handleEmailChange}
+            required
+            className="form-input"
+          />
+        </label>
+        <label>
+          Password:
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="form-input"
+          />
+        </label>
         <button type="submit" className="form-button">{selectedUser ? "Update User" : "Add User"}</button>
         {selectedUser && <button type="button" onClick={handleDelete} className="form-button-delete">Delete User</button>}
       </form>
     </div>
-    );
+  );
 };
 
 export default AdminForm;
-
