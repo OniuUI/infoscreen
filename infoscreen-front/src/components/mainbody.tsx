@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import NavBar from './navbar';
 import LeftSidebar from './leftsidebar';
 import SquareField from './squarefield';
@@ -12,14 +13,22 @@ import NewsFeed from "./newsfeed";
 import Gallery from "./gallery";
 
 const Container: React.FC = () => {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const refreshoken = localStorage.getItem('refreshToken');
+        if (!refreshoken) {
+            navigate('/login'); // Redirect to /login if accessToken is not available
+        }
+    }, [navigate]);
 
     useEffect(() => {
         const intervalId = setInterval(() => {
             window.location.reload();
         }, 4 * 60 * 60 * 1000); // 4 hours
 
-        return () => clearInterval(intervalId); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
-    }, [])
+        return () => clearInterval(intervalId);
+    }, []);
 
     return (
         <div className="container">
@@ -35,7 +44,7 @@ const Container: React.FC = () => {
                             </Carousel>
                         </SquareField>
                         <SquareField>
-                             <CurrentTime />
+                            <CurrentTime />
                         </SquareField>
                         <SquareField>
                             <Carousel interval={420000}>
@@ -44,7 +53,7 @@ const Container: React.FC = () => {
                             </Carousel>
                         </SquareField>
                         <SquareField>
-                                <ThirstyLeaderboard />
+                            <ThirstyLeaderboard />
                         </SquareField>
                     </div>
                 </main>
