@@ -10,8 +10,7 @@ const Newsfeed: React.FC = () => {
   useEffect(() => {
     const fetchNewsfeed = async () => {
       try {
-        const response = await apiService.get(`/rss`);
-        const data: RSSFeed = await response.json();
+        const data: RSSFeed = await apiService.get(`/rss`);
 
         setFeed(
           data.items.map(({ title, link, description, contentSnippet, date, categories }): RSSItem => ({

@@ -24,8 +24,7 @@ const Event: React.FC = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await apiService.get(`/events`);
-        let data = await response.json();
+        let data = await apiService.get(`/events`);
 
         // Add daysToEvent to each event
         data = data.map((event: EventInterface) => ({
