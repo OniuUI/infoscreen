@@ -10,7 +10,7 @@ const NavBar: React.FC = () => {
     return (
         <header>
       <div className="nav-items">
-        {/* Add your navigation items here */}
+
       </div>
             <div className="dates-container">
                 {datesInCurrentMonth.map((date, index) => (
