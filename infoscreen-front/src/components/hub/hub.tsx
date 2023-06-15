@@ -51,7 +51,7 @@ const Hub: React.FC = () => {
 
     useEffect(() => {
         // Redirect to /login if accessToken is not available
-        const refreshToken = localStorage.getItem('refreshToken');
+        const refreshToken = localStorage.getItem('accessToken');
         if (!refreshToken) {
             navigate('/login');
         }

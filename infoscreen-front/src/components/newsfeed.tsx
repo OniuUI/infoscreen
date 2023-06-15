@@ -10,18 +10,8 @@ const Newsfeed: React.FC = () => {
   useEffect(() => {
     const fetchNewsfeed = async () => {
       try {
-        const data: RSSFeed = await apiService.get(`/rss`);
-
-        setFeed(
-          data.items.map(({ title, link, description, contentSnippet, date, categories }): RSSItem => ({
-            title,
-            link,
-            description,
-            contentSnippet,
-            date,
-            categories: categories ?? [],
-          }))
-        );
+        const data: RSSItem[] = await apiService.get(`/rss`);
+        setFeed(data);
       } catch (error) {
         console.error('Error fetching feed data:', error);
       }
@@ -37,18 +27,19 @@ const Newsfeed: React.FC = () => {
     <div className="newsfeed-container">
       <div className="newsfeed">
         {feed.map((item, index) => (
-          <div className="news-card" key={index}>
+          <div className="news-card" key={index} style={{backgroundColor: item.color}}>
             <h2 className="news-title">{item.title}</h2>
             <p className="news-content">{item.contentSnippet}</p>
             <div className="news-meta">
               <span className="news-date">{item.date}</span>
-              <span className="news-categories">{item.categories.join(', ')}</span>
+              <span className="news-categories">{item.categories ? item.categories.join(', ') : ''}</span>
             </div>
           </div>
-        ))}
+          ))}
       </div>
     </div>
     );
 };
 
 export default Newsfeed;
+

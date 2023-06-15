@@ -16,7 +16,7 @@ const Container: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const refreshoken = localStorage.getItem('refreshToken');
+        const refreshoken = localStorage.getItem('accessToken');
         if (!refreshoken) {
             navigate('/login'); // Redirect to /login if accessToken is not available
         }
@@ -48,8 +48,8 @@ const Container: React.FC = () => {
                         </SquareField>
                         <SquareField>
                             <Carousel interval={420000}>
-                                <Temperature />
                                 <NewsFeed />
+                                <Temperature />
                             </Carousel>
                         </SquareField>
                         <SquareField>

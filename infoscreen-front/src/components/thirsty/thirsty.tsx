@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Person from '../person';
 
 import {apiService} from "../api/apiservice";
 import thirstylogo from '../img/thirsty.svg';
 
 const Thirsty: React.FC = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState<any[]>([]);
+
+  useEffect(() => {
+    const refreshoken = localStorage.getItem('accessToken');
+    if (!refreshoken) {
+      navigate('/login'); // Redirect to /login if accessToken is not available
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const fetchUsers = async () => {

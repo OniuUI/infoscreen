@@ -1,12 +1,12 @@
 export interface RSSItem {
-    title: string;
-    link: string;
-    description: string;
-    contentSnippet: string; // Add contentSnippet property
-    date: string; // Add date property
-    categories: string[]; // Add categories property
+  title: string;
+  link: string;
+  description: string;
+  contentSnippet: string;
+  date: string;
+  categories: string[];
+  color: string;
 }
-
 
 export interface RSSFeed {
   items: RSSItem[];
