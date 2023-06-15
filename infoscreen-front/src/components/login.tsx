@@ -9,10 +9,12 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoginSuccess, setIsLoginSuccess] = useState(false);
+  const [isLoginFailure, setIsLoginFailure] = useState(false); // New state
   const navigate = useNavigate();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsLoginFailure(false); // Reset the failure state on each login attempt
 
     try {
       const response = await axios.post(`${API_BASE_URL}/login`, {
@@ -26,12 +28,17 @@ const Login = () => {
         localStorage.setItem('refreshToken', response.data.refreshToken);
         localStorage.setItem('userIdent', response.data.userIdent);
         setIsLoginSuccess(true);
-        setTimeout(() => navigate('/'), 8000); // Redirect after 3 seconds
+        setTimeout(() => navigate('/'), 3000); // Redirect after 3 seconds
       }
     } catch (error) {
       console.error('Error during authentication:', error);
+      setIsLoginFailure(true); // Set the failure state on login failure
+      setTimeout(() => setIsLoginFailure(false), 1500); // Reset the failure state after 1.5 seconds
     }
   };
+
+  // Add the shake class to the container div when login fails
+  const containerClasses = isLoginFailure ? 'shake' : '';
 
   return (
     <div
@@ -48,6 +55,7 @@ const Login = () => {
         <LoginSuccess />
       ) : (
         <div
+          className={containerClasses}
           style={{
             backgroundColor: 'white',
             padding: '2em',
@@ -96,11 +104,17 @@ const Login = () => {
             >
               Login
             </button>
+
+            {isLoginFailure && (
+              <p style={{ color: 'red', marginTop: '1em' }}>
+                Incorrect email or password.
+              </p>
+              )}
           </form>
         </div>
-      )}
+        )}
     </div>
-  );
+    );
 };
 
 export default Login;
