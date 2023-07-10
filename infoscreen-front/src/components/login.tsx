@@ -27,6 +27,14 @@ const Login = () => {
         localStorage.setItem('accessToken', response.data.accessToken);
         localStorage.setItem('refreshToken', response.data.refreshToken);
         localStorage.setItem('userIdent', response.data.userIdent);
+
+        // Set up a timer to clear tokens after they expire
+        setTimeout(() => {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('userIdent');
+          }, response.data.expiresIn * 1000);  // expiresIn is in seconds
+
         setIsLoginSuccess(true);
         setTimeout(() => navigate('/'), 3000); // Redirect after 3 seconds
       }
@@ -36,6 +44,7 @@ const Login = () => {
       setTimeout(() => setIsLoginFailure(false), 1500); // Reset the failure state after 1.5 seconds
     }
   };
+  
 
   // Add the shake class to the container div when login fails
   const containerClasses = isLoginFailure ? 'shake' : '';

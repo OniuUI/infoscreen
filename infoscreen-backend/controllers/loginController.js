@@ -1,10 +1,13 @@
+// backend
 const jwt = require('jsonwebtoken');
 const userController = require('./userController');
 const bcrypt = require('bcrypt');
 
+const ACCESS_TOKEN_EXPIRATION_TIME = 15 * 60; // 15 minutes in seconds
+
 // Function to generate new access token
 const generateAccessToken = (userId) => {
-    return jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+    return jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRATION_TIME + 's' });
 };
 
 exports.login = async (req, res) => {
@@ -28,6 +31,8 @@ exports.login = async (req, res) => {
     const refreshToken = jwt.sign({ userId: user._id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
     const userIdent = user._id;
 
+    // Get the expiration time of the access token
+    const accessTokenExpiration = Math.floor(Date.now() / 1000) + ACCESS_TOKEN_EXPIRATION_TIME;
 
     // Update user with refreshToken
     user.refreshToken = refreshToken;
@@ -37,6 +42,7 @@ exports.login = async (req, res) => {
         accessToken,
         refreshToken,
         userIdent,
+        expiresIn: accessTokenExpiration // Now expiresIn represents the timestamp at which the access token will expire
     });
 };
 
@@ -50,7 +56,6 @@ exports.refreshToken = async (req, res) => {
     try {
         const payload = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
         const user = await userController.getUserById(payload.userId);
-
 
         if (token !== user.refreshToken) {
             return res.sendStatus(403);
@@ -68,17 +73,16 @@ exports.refreshToken = async (req, res) => {
     }
 };
 
-
 exports.logout = async (req, res) => {
     try {
         // Get user from token
         const token = req.body.token;
         const payload = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
-        const user = await userController.getUser(payload.userId);
+        const user = await userController.getUserById(payload.userId);
 
         // Remove the refresh token
         user.refreshToken = null;
-        await userController.updateUser(user);
+        await userController.updateUserById(user._id, user);
 
         res.sendStatus(204);
     } catch (err) {

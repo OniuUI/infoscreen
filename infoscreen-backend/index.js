@@ -13,6 +13,7 @@ const eventRoutes = require('./routes/eventRoutes');
 const galleryRouter = require('./routes/galleryRoutes');
 const rssRoutes = require('./routes/rssRoutes');
 const loginRoutes = require('./routes/loginRoutes');
+const hubRoutes = require('./routes/hubRoutes');
 
 
 
@@ -72,6 +73,7 @@ app.use(async (req, res, next) => {
 app.use('/api/login', loginRoutes);
 
 //Secured paths
+app.use('/api/hub', verifyAccessToken, hubRoutes);
 app.use('/api/events', verifyAccessToken, eventRoutes);
 app.use('/api/rss', verifyAccessToken, rssRoutes);
 app.use('/api/gallery', verifyAccessToken, galleryRouter);

@@ -1,5 +1,3 @@
-// controllers/hubController.js
-
 const { getDb } = require('../db');
 
 exports.getUserProfile = async (req, res) => {
@@ -16,5 +14,40 @@ exports.getUserProfile = async (req, res) => {
         res.send({ user: userWithoutPassword });
     } catch (err) {
         res.status(500).send({ error: "Unable to fetch user profile data." });
+    }
+};
+
+exports.saveUserPreferences = async (req, res) => {
+    try {
+        const db = getDb();
+        const userId = req.params.id;
+        const preferences = req.body;
+
+        await db.collection('userPreferences').updateOne(
+            { _id: userId },
+            { $set: { preferences } },
+            { upsert: true }
+        );
+
+        res.sendStatus(200);
+    } catch (err) {
+        res.status(500).send({ error: "Unable to save user preferences." });
+    }
+};
+
+exports.getUserPreferences = async (req, res) => {
+    try {
+        const db = getDb();
+        const userId = req.params.id;
+
+        const preferences = await db.collection('userPreferences').findOne({ _id: userId });
+
+        if (!preferences) {
+            res.send([]);
+        } else {
+            res.send(preferences.preferences);
+        }
+    } catch (err) {
+        res.status(500).send({ error: "Unable to fetch user preferences." });
     }
 };
