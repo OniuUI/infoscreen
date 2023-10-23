@@ -4,9 +4,11 @@
     display: flex;
     align-items: center;
     margin-bottom: 1rem;
-    background: #ffffff;
+    background: #b5b5b5;
     border-radius: 1vh;
     padding: 1vh;
+    animation: breathe 4s infinite;
+    border: 1px solid #4a4a4a /* Optional: Add a border */
 }
 
 .person h3 {
@@ -52,4 +54,13 @@
 
 .person-info span {
     line-height: 1.2;
+}
+
+@keyframes breathe {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
 }

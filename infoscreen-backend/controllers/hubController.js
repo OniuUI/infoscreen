@@ -9,7 +9,6 @@ exports.getUserProfile = async (req, res) => {
         if (!user) {
             return res.status(404).send({ error: 'User not found.' });
         }
-        // You can exclude sensitive data like password from the response
         const { password, ...userWithoutPassword } = user;
         res.send({ user: userWithoutPassword });
     } catch (err) {
@@ -21,11 +20,11 @@ exports.saveUserPreferences = async (req, res) => {
     try {
         const db = getDb();
         const userId = req.params.id;
-        const preferences = req.body;
+        const {gridLength, gridComponents} = req.body;
 
         await db.collection('userPreferences').updateOne(
             { _id: userId },
-            { $set: { preferences } },
+            { $set: { gridLength, gridComponents } },
             { upsert: true }
         );
 
@@ -43,9 +42,10 @@ exports.getUserPreferences = async (req, res) => {
         const preferences = await db.collection('userPreferences').findOne({ _id: userId });
 
         if (!preferences) {
-            res.send([]);
+            res.send({gridLength: 2, gridComponents: []});  // default preferences
         } else {
-            res.send(preferences.preferences);
+            const {gridLength, gridComponents} = preferences;
+            res.send({gridLength, gridComponents});
         }
     } catch (err) {
         res.status(500).send({ error: "Unable to fetch user preferences." });

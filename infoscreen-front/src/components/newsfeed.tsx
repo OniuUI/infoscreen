@@ -18,7 +18,7 @@ const Newsfeed: React.FC = () => {
     };
 
     fetchNewsfeed();
-    const intervalId = setInterval(fetchNewsfeed, 30000); // Fetch every 30 seconds
+    const intervalId = setInterval(fetchNewsfeed, 420000); // Fetch every 7 min
 
     return () => clearInterval(intervalId); // Cleanup interval on unmount
   }, []);

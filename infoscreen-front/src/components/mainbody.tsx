@@ -11,6 +11,8 @@ import ThirstyLeaderboard from "./thirstyleaderboard";
 import Carousel from './carousel';
 import NewsFeed from "./newsfeed";
 import Gallery from "./gallery";
+import DeparturesDisplay from "./ruter/ruter";
+import RightSidebar from "./rightsidebar";
 
 const Container: React.FC = () => {
     const navigate = useNavigate();
@@ -57,6 +59,7 @@ const Container: React.FC = () => {
                         </SquareField>
                     </div>
                 </main>
+                <RightSidebar />
             </div>
         </div>
         );
