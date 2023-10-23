@@ -4,7 +4,7 @@
     display: flex;
     align-items: center;
     margin-bottom: 1rem;
-    background: #b5b5b5;
+    background: white;
     border-radius: 1vh;
     padding: 1vh;
     animation: breathe 4s infinite;
