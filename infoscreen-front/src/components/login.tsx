@@ -14,7 +14,7 @@ const Login = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setIsLoginFailure(false); // Reset the failure state on each login attempt
+    //setIsLoginFailure(false); // Reset the failure state on each login attempt
 
     try {
       const response = await axios.post(`${API_BASE_URL}/login`, {
@@ -33,7 +33,7 @@ const Login = () => {
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
           localStorage.removeItem('userIdent');
-          }, response.data.expiresIn * 1000);  // expiresIn is in seconds
+          }, response.data.expiresIn / 1000);  // expiresIn is in seconds
 
         setIsLoginSuccess(true);
         setTimeout(() => navigate('/'), 3000); // Redirect after 3 seconds

@@ -54,7 +54,7 @@ const ImageForm: React.FC = () => {
         };
 
         try {
-            const response = await apiService.get(`/gallery`);
+            const response = await apiService.post(`/gallery`, imageObj);
 
             if (response.ok) {
                 alert("Image added successfully!");
