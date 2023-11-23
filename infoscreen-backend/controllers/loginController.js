@@ -27,16 +27,19 @@ exports.login = async (req, res) => {
     }
 
     // Create tokens
+    console.log("Authenticating")
     const accessToken = generateAccessToken(user._id);
     const refreshToken = jwt.sign({ userId: user._id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
     const userIdent = user._id;
 
     // Get the expiration time of the access token
-    const accessTokenExpiration = Math.floor(Date.now() / 1000) + ACCESS_TOKEN_EXPIRATION_TIME;
+    const accessTokenExpiration = Math.floor(Date.now() * 1000) + ACCESS_TOKEN_EXPIRATION_TIME;
 
     // Update user with refreshToken
     user.refreshToken = refreshToken;
     await userController.updateUserById(user._id, user);
+
+    console.log("User authenticated")
 
     res.send({
         accessToken,
