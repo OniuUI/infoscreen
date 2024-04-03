@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import LoginSuccess from "./LoginSuccess";
@@ -11,29 +11,43 @@ const Login = () => {
   const [isLoginSuccess, setIsLoginSuccess] = useState(false);
   const [isLoginFailure, setIsLoginFailure] = useState(false); // New state
   const navigate = useNavigate();
+  let logoutTimer: any;
+
+  useEffect(() => {
+    return () => {
+      if(logoutTimer) {
+        clearTimeout(logoutTimer);
+      }
+    }
+  }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    //setIsLoginFailure(false); // Reset the failure state on each login attempt
+    setIsLoginFailure(false); // Reset the failure state on each login attempt
 
     try {
       const response = await axios.post(`${API_BASE_URL}/login`, {
         email,
         password,
       });
-
+      console.log(response)
       // If successful, store the auth tokens
       if (response.data) {
+        console.log("Setting tokens")
         localStorage.setItem('accessToken', response.data.accessToken);
         localStorage.setItem('refreshToken', response.data.refreshToken);
         localStorage.setItem('userIdent', response.data.userIdent);
 
-        // Set up a timer to clear tokens after they expire
-        setTimeout(() => {
+        if(logoutTimer) {
+          clearTimeout(logoutTimer);
+        }
+
+        logoutTimer = setTimeout(() => {
+          console.log("Token expired, access denied")
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
           localStorage.removeItem('userIdent');
-          }, response.data.expiresIn / 1000);  // expiresIn is in seconds
+        }, response.data.expiresIn * 1000);
 
         setIsLoginSuccess(true);
         setTimeout(() => navigate('/'), 3000); // Redirect after 3 seconds
@@ -44,7 +58,6 @@ const Login = () => {
       setTimeout(() => setIsLoginFailure(false), 1500); // Reset the failure state after 1.5 seconds
     }
   };
-  
 
   // Add the shake class to the container div when login fails
   const containerClasses = isLoginFailure ? 'shake' : '';
