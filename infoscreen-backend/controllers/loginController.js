@@ -10,6 +10,30 @@ const generateAccessToken = (userId) => {
     return jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRATION_TIME + 's' });
 };
 
+/**
+ * @openapi
+ * /api/login:
+ *   post:
+ *     tags:
+ *       - Login
+ *     description: Authenticates a user and returns access and refresh tokens
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Authentication successful.
+ *       401:
+ *         description: Invalid email or password.
+ */
 exports.login = async (req, res) => {
     const { email, password } = req.body;
 
@@ -49,6 +73,32 @@ exports.login = async (req, res) => {
     });
 };
 
+/**
+ * @openapi
+ * /api/refresh-token:
+ *   post:
+ *     tags:
+ *       - Login
+ *     description: Refreshes an access token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Access token refreshed successfully.
+ *       401:
+ *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden.
+ *       400:
+ *         description: Bad request.
+ */
 exports.refreshToken = async (req, res) => {
     const token  = req.body.token;
 
@@ -76,6 +126,28 @@ exports.refreshToken = async (req, res) => {
     }
 };
 
+/**
+ * @openapi
+ * /api/logout:
+ *   post:
+ *     tags:
+ *       - Login
+ *     description: Logs out a user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *     responses:
+ *       204:
+ *         description: Logout successful.
+ *       500:
+ *         description: Unable to logout user.
+ */
 exports.logout = async (req, res) => {
     try {
         // Get user from token

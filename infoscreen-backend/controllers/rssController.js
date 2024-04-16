@@ -9,6 +9,19 @@ const shuffleArray = (array) => {
   }
 }
 
+/**
+ * @openapi
+ * /api/rss/distribute:
+ *   get:
+ *     tags:
+ *       - Rss
+ *     description: Distributes RSS feeds
+ *     responses:
+ *       200:
+ *         description: A list of shuffled RSS feeds.
+ *       500:
+ *         description: Unable to fetch feeds.
+ */
 exports.distributeRSSFeeds = async (req, res) => {
   try {
     const db = getDb();
@@ -37,6 +50,19 @@ exports.distributeRSSFeeds = async (req, res) => {
 };
 
 // Controller for fetching all RSS feeds
+/**
+ * @openapi
+ * /api/rss:
+ *   get:
+ *     tags:
+ *       - Rss
+ *     description: Returns all RSS feeds
+ *     responses:
+ *       200:
+ *         description: A list of RSS feeds.
+ *       500:
+ *         description: Unable to fetch feeds.
+ */
 exports.getRSSFeeds = async (req, res) => {
     try {
         const db = getDb();
@@ -51,6 +77,34 @@ exports.getRSSFeeds = async (req, res) => {
 };
 
 // Controller for adding a new RSS feed
+/**
+ * @openapi
+ * /api/rss:
+ *   post:
+ *     tags:
+ *       - Rss
+ *     description: Adds a new RSS feed
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               url:
+ *                 type: string
+ *               color:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Feed successfully added.
+ *       400:
+ *         description: Missing required feed data.
+ *       500:
+ *         description: Unable to add feed.
+ */
 exports.addFeed = async (req, res) => {
     const { name, url, color } = req.body;
 
@@ -73,6 +127,26 @@ exports.addFeed = async (req, res) => {
 };
 
 // Controller for deleting a feed
+/**
+ * @openapi
+ * /api/rss/{id}:
+ *   delete:
+ *     tags:
+ *       - Rss
+ *     description: Deletes an RSS feed
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID of the feed to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Feed successfully deleted.
+ *       500:
+ *         description: Unable to delete feed.
+ */
 exports.deleteFeed = async (req, res) => {
     const { id } = req.params; // Get the feed ID from the URL parameters
 

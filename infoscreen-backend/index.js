@@ -8,6 +8,26 @@ const { connectToDb, getDb } = require('./db');
 const { scheduleResetLeaderboard } = require('./sheduledtasks');
 const  verifyAccessToken  = require('./security/validation')
 
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
+// Swagger setup
+const options = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'Infoscreen API',
+            version: '1.0.0',
+        },
+    },
+    // Path to the API docs
+    apis: ['./routes/*.js', './controllers/*.js'],
+};
+
+const app = express();
+const specs = swaggerJsdoc(options);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
 const userRoutes = require('./routes/userRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const galleryRouter = require('./routes/galleryRoutes');
@@ -17,7 +37,9 @@ const hubRoutes = require('./routes/hubRoutes');
 
 
 
-const app = express();
+
+
+
 
 // Body parser, sets maximum body payload limit to 50MB
 app.use(bodyParser.json({ limit: '50mb' }));

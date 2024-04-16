@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavBar from './navbar';
 import LeftSidebar from './leftsidebar';
@@ -19,11 +19,23 @@ interface ComponentInterface {
     _id: string;
     org: string;
     viewType: number;
-    components: any[];
+    components: string[];
 }
+
+const componentMapping: { [key: string]: React.FC<any> } = {
+    'CurrentTime': CurrentTime,
+    'Temperature': Temperature,
+    'Event': Event,
+    'ThirstyLeaderboard': ThirstyLeaderboard,
+    'Carousel': Carousel,
+    'NewsFeed': NewsFeed,
+    'Gallery': Gallery,
+    'DeparturesDisplay': DeparturesDisplay,
+};
 
 const Container: React.FC = () => {
     const navigate = useNavigate();
+    const [components, setComponents] = useState<string[]>([]);
 
     useEffect(() => {
         const refreshoken = localStorage.getItem('accessToken');
@@ -37,7 +49,7 @@ const Container: React.FC = () => {
             try {
                 let response = await apiService.get(`/components`);
                 let data: ComponentInterface = response.data;
-                console.log(data.components);
+                setComponents(data.components);
             } catch (error) {
                 console.error(error);
             }
@@ -68,30 +80,20 @@ const Container: React.FC = () => {
                 <LeftSidebar />
                 <main>
                     <div className="grid">
-                        <SquareField>
-                            <Carousel interval={420000}>
-                                <Gallery />
-                                <Event />
-                            </Carousel>
-                        </SquareField>
-                        <SquareField>
-                            <CurrentTime />
-                        </SquareField>
-                        <SquareField>
-                            <Carousel interval={420000}>
-                                <NewsFeed />
-                                <Temperature />
-                            </Carousel>
-                        </SquareField>
-                        <SquareField>
-                            <ThirstyLeaderboard />
-                        </SquareField>
+                        {components.map((componentName, index) => {
+                            const Component = componentMapping[componentName];
+                            return (
+                                <SquareField key={index}>
+                                    <Component />
+                                </SquareField>
+                            );
+                        })}
                     </div>
                 </main>
                 <RightSidebar />
             </div>
         </div>
-        );
+    );
 };
 
 export default Container;

@@ -8,6 +8,7 @@ import Thirsty from "./components/thirsty/thirsty";
 import Login from "./components/login";
 import Profile from "./components/hub/profile/profile";
 import Hub from "./components/hub/hub";
+import Kaizen from "./components/kaizen";
 
 
 const App: React.FC = () => {
@@ -21,6 +22,7 @@ const App: React.FC = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/hub" element={<Hub />} />
           <Route path="/hub/profile" element={<Profile />} />
+          <Route path="/kaizen" element={<Kaizen />} />
         </Routes>
       </div>
     </Router>

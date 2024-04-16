@@ -1,6 +1,20 @@
 // galleryController.js
 const getDb = require('../db').getDb;
-
+/**
+ * @openapi
+ * /api/gallery:
+ *   get:
+ *     tags:
+ *       - Gallery
+ *     description: Returns a list of images
+ *     responses:
+ *       200:
+ *         description: A list of images.
+ *       404:
+ *         description: No images found.
+ *       500:
+ *         description: Unable to read image data.
+ */
 exports.getImages = async (req, res) => {
   try {
     const db = getDb();
@@ -16,7 +30,41 @@ exports.getImages = async (req, res) => {
   }
 };
 
-
+/**
+ * @openapi
+ * /api/gallery:
+ *   post:
+ *     tags:
+ *       - Gallery
+ *     description: Uploads a new image
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               dateUploaded:
+ *                 type: string
+ *                 format: date-time
+ *               imageName:
+ *                 type: string
+ *               base64Image:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Image successfully uploaded.
+ *       400:
+ *         description: Missing required image data.
+ *       500:
+ *         description: Unable to upload image.
+ */
 exports.addImage = async (req, res) => {
   const { userId, firstName, lastName, dateUploaded, imageName, base64Image } = req.body;
 
