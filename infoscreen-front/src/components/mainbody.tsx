@@ -13,6 +13,14 @@ import NewsFeed from "./newsfeed";
 import Gallery from "./gallery";
 import DeparturesDisplay from "./ruter/ruter";
 import RightSidebar from "./rightsidebar";
+import {apiService} from "./api/apiservice";
+
+interface ComponentInterface {
+    _id: string;
+    org: string;
+    viewType: number;
+    components: any[];
+}
 
 const Container: React.FC = () => {
     const navigate = useNavigate();
@@ -23,6 +31,27 @@ const Container: React.FC = () => {
             navigate('/login'); // Redirect to /login if accessToken is not available
         }
     }, [navigate]);
+
+    useEffect(() => {
+        const fetchComponents = async () => {
+            try {
+                let response = await apiService.get(`/components`);
+                let data: ComponentInterface = response.data;
+                console.log(data.components);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // Call fetchComponents immediately
+        fetchComponents();
+
+        // Then set up an interval to call fetchComponents every 15 seconds
+        const intervalId = setInterval(fetchComponents, 15 * 1000);
+
+        // Clear the interval when the component unmounts
+        return () => clearInterval(intervalId);
+    }, []);
 
     useEffect(() => {
         const intervalId = setInterval(() => {
