@@ -4,15 +4,14 @@ exports.getOrgComponents = async (req, res) => {
     try {
         const db = getDb();
         const userId = req.params.id;
-        const user = await db.collection('users').findOne({ _id: userId });
+        const component = await db.collection('components').findOne({ _id: userId });
 
-        if (!user) {
-            return res.status(404).send({ error: 'User not found.' });
+        if (!component) {
+            return res.status(404).send({ error: 'Component structure not found.' });
         }
-        const { password, ...userWithoutPassword } = user;
-        res.send({ user: userWithoutPassword });
+
     } catch (err) {
-        res.status(500).send({ error: "Unable to fetch user profile data." });
+        res.status(500).send({ error: "Unable to fetch component structure data." });
     }
 };
 
@@ -51,3 +50,15 @@ exports.getSelectedComponents = async (req, res) => {
         res.status(500).send({ error: "Unable to fetch user preferences." });
     }
 };
+
+exports.setComponentStructure = async (req, res) => {
+    try {
+        const db = getDb();
+        const component = req.body;
+        const result = await db.collection('components').insertOne(component);
+        console.log(`Component structure saved with ID: ${result.insertedId}`);
+        res.send({ success: true });
+    } catch (err) {
+        res.status(500).send({ error: "Unable to save component structure data."});
+    }
+}

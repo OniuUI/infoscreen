@@ -3,7 +3,8 @@ const componentController = require('../controllers/componentController');
 const router = express.Router();
 
 router.get('/:id/orgcomponents', componentController.getOrgComponents);
-router.post('/:id/kaizenboard', componentController.getKaizenBoard);
-router.get('/:id/selected', componentController.getSelectedComponents);
+router.put('/:id/kaizenboard', componentController.getKaizenBoard);
+router.get('/:id/selectedcomponents', componentController.getSelectedComponents);
+router.post('/structure', componentController.setComponentStructure);
 
 module.exports = router;
