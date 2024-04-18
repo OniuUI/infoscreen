@@ -60,22 +60,36 @@ exports.getSelectedComponents = async (req, res) => {
     }
 };
 
-exports.setComponentStructure = async (req, res) => {
+// Create a new component structure
+exports.createComponentStructure = async (req, res) => {
     try {
         const db = getDb();
         const component = {
             ...req.body,
             active: req.body.active || false,
         };
-        const result = await db.collection('componentStructures').updateOne(
-            { id: component.id }, // filter
-            { $set: component }, // update
-            { upsert: true } // options
-        );
-        console.log(`Component structure saved with ID: ${component.id}`);
+        const result = await db.collection('componentStructures').insertOne(component);
+        console.log(`Component structure created with ID: ${component.id}`);
         res.send({ success: true });
     } catch (err) {
-        res.status(500).send({ error: "Unable to save component structure data."});
+        res.status(500).send({ error: "Unable to create component structure data."});
+    }
+};
+
+// Update the active status of a component structure
+exports.updateActiveStatus = async (req, res) => {
+    try {
+        const db = getDb();
+        const { id, active } = req.body;
+        const result = await db.collection('componentStructures').updateOne(
+            { id: id }, // filter
+            { $set: { active: active } }, // update
+            { upsert: true } // options
+        );
+        console.log(`Active status updated for component structure with ID: ${id}`);
+        res.send({ success: false });
+    } catch (err) {
+        res.status(500).send({ error: "Unable to update active status."});
     }
 };
 

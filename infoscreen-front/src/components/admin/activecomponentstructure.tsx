@@ -2,10 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { apiService } from '../api/apiservice';
 
 interface ComponentStructureInterface {
-    _id: {
-        $oid: string;
-    };
-    id: string;
+    id: number;
     org: string;
     viewType: number;
     components: string[];
@@ -39,16 +36,16 @@ const ActiveComponentStructure = () => {
     }, []);
 
     const handleSelect = async (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const newActiveStructureId = event.target.value;
-        setSelectedStructure(newActiveStructureId);
+        const newActiveStructureId = Number(event.target.value); // Convert the value to a number
+        setSelectedStructure(newActiveStructureId.toString()); // Convert the value back to a string
         try {
             // Set the previously active structure to inactive
             const previousActiveStructure = structures.find(structure => structure.active);
             if (previousActiveStructure) {
-                await apiService.post('/components/structure', { id: previousActiveStructure.id, active: false }); // replace with your actual API endpoint
+                await apiService.post('/components/updateActiveStatus', { id: previousActiveStructure.id, active: false }); // Call the update endpoint
             }
             // Set the newly selected structure to active
-            await apiService.post('/components/structure', { id: newActiveStructureId, active: true }); // replace with your actual API endpoint
+            await apiService.post('/components/updateActiveStatus', { id: newActiveStructureId, active: true }); // Call the update endpoint
         } catch (error) {
             console.error("Unable to set active component structure.", error);
         }

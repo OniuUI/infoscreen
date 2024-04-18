@@ -57,7 +57,7 @@ const SetComponentStructure = () => {
         };
 
         try {
-            await apiService.post('/components/structure', structure); // Updated API endpoint
+            await apiService.post('/components/createStructure', structure); // Updated API endpoint
             alert('Component structure set successfully');
         } catch (error) {
             console.error('Error setting component structure', error);

@@ -14,6 +14,7 @@ import Gallery from "./gallery";
 import DeparturesDisplay from "./ruter/ruter";
 import RightSidebar from "./rightsidebar";
 import {apiService} from "./api/apiservice";
+import Kaizen from "./kaizen";
 
 interface ComponentInterface {
     _id: {
@@ -35,6 +36,7 @@ const componentMapping: { [key: string]: React.FC<any> } = {
     'NewsFeed': NewsFeed,
     'Gallery': Gallery,
     'DeparturesDisplay': DeparturesDisplay,
+    "Kaizen": Kaizen
 };
 
 const Container: React.FC = () => {
