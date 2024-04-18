@@ -50,7 +50,7 @@ const SetComponentStructure = () => {
         event.preventDefault();
 
         const structure = {
-            _id: '1', // This should be generated or inputted by the user
+            id: Math.floor(Math.random() * 90000000) + 10000000,
             org,
             viewType,
             components

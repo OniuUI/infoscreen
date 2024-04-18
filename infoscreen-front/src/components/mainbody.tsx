@@ -16,10 +16,14 @@ import RightSidebar from "./rightsidebar";
 import {apiService} from "./api/apiservice";
 
 interface ComponentInterface {
-    _id: string;
+    _id: {
+        $oid: string;
+    };
+    id: string;
     org: string;
-    viewType: number;
-    components: string[];
+    componentName: string;
+    component: string;
+    active: boolean;
 }
 
 const componentMapping: { [key: string]: React.FC<any> } = {
@@ -47,19 +51,30 @@ const Container: React.FC = () => {
     useEffect(() => {
         const fetchComponents = async () => {
             try {
-                let response = await apiService.get(`/components`);
-                let data: ComponentInterface = response.data;
-                setComponents(data.components);
+                // Fetch all structures
+                let data = await apiService.get(`/components/componentStructures`);
+                data = data.map((structure: any) => ({
+                    ...structure,
+                    // Add any additional properties or transformations here
+                }));
+
+                // Find the active structure
+                const activeStructure = data.find((structure: ComponentInterface) => structure.active);
+
+                // If an active structure is found, set the components state with its components
+                if (activeStructure) {
+                    setComponents(activeStructure.components);
+                }
             } catch (error) {
-                console.error(error);
+                console.error("Unable to fetch component structures.", error);
             }
         }
 
         // Call fetchComponents immediately
         fetchComponents();
 
-        // Then set up an interval to call fetchComponents every 15 seconds
-        const intervalId = setInterval(fetchComponents, 15 * 1000);
+        // Then set up an interval to call fetchComponents every 30 seconds
+        const intervalId = setInterval(fetchComponents, 30 * 1000);
 
         // Clear the interval when the component unmounts
         return () => clearInterval(intervalId);

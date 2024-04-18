@@ -6,6 +6,7 @@ import EventForm from "./eventform";
 import ImageForm from "./imageform";
 import RSSFeedForm from "./rssfeedform";
 import Componentstructure from "./componentstructure";
+import Activecomponentstructure from "./activecomponentstructure";
 
 const Admin: React.FC = () => {
     const navigate = useNavigate();
@@ -28,6 +29,7 @@ const Admin: React.FC = () => {
             <ImageForm/>
             <RSSFeedForm/>
             <Componentstructure/>
+            <Activecomponentstructure/>
         </div>
         );
 };
