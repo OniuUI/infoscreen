@@ -4,7 +4,7 @@ exports.getOrgComponents = async (req, res) => {
     try {
         const db = getDb();
         const userId = req.params.id;
-        const component = await db.collection('components').findOne({ _id: userId });
+        const component = await db.collection('componentStructures').findOne({ _id: userId });
 
         if (!component) {
             return res.status(404).send({ error: 'Component structure not found.' });
@@ -14,6 +14,18 @@ exports.getOrgComponents = async (req, res) => {
         res.status(500).send({ error: "Unable to fetch component structure data." });
     }
 };
+
+exports.getAvailableSystemComponents = async (req, res) => {
+    try {
+        const db = getDb();
+        const components = await db.collection('availableComponents').find().toArray();
+        //console.log(components)
+        res.send(components);
+    } catch (err) {
+        res.status(500).send({ error: "Unable to fetch available system components." });
+    }
+
+}
 
 exports.getKaizenBoard = async (req, res) => {
     try {
@@ -54,11 +66,15 @@ exports.getSelectedComponents = async (req, res) => {
 exports.setComponentStructure = async (req, res) => {
     try {
         const db = getDb();
-        const component = req.body;
+        const component = {
+            ...req.body,
+            active: req.body.active || false,
+        };
         const result = await db.collection('components').insertOne(component);
         console.log(`Component structure saved with ID: ${result.insertedId}`);
         res.send({ success: true });
     } catch (err) {
         res.status(500).send({ error: "Unable to save component structure data."});
     }
-}
+};
+

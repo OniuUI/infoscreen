@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { apiService } from '../api/apiservice';
 
+interface ComponentInterface {
+    _id: {
+        $oid: string;
+    };
+    org: string;
+    componentName: string;
+    component: string;
+}
+
 const SetComponentStructure = () => {
     const [org, setOrg] = useState('');
     const [viewType, setViewType] = useState<number>(1);
     const [components, setComponents] = useState<string[]>(Array(viewType).fill(''));
-    const [availableComponents, setAvailableComponents] = useState<string[]>([]);
+    const [availableComponents, setAvailableComponents] = useState<ComponentInterface[]>([]);
 
     useEffect(() => {
         setComponents(Array(viewType).fill('')); // Reset components when viewType changes
@@ -14,14 +23,21 @@ const SetComponentStructure = () => {
     useEffect(() => {
         const fetchAvailableComponents = async () => {
             try {
-                const response = await apiService.get('/components');
-                setAvailableComponents(response.data);
+                let data = await apiService.get('/components/availableComponents'); // replace with your actual API endpoint
+                data = data.map((component: any) => ({
+                    ...component,
+                    // Add any additional properties or transformations here
+                }));
+                // Sort the data if needed
+                // data.sort((a: ComponentInterface, b: ComponentInterface) => /* sorting logic */);
+                setAvailableComponents(data);
             } catch (error) {
-                console.error(error);
+                console.error("Unable to fetch available system components.", error);
             }
         };
-
         fetchAvailableComponents();
+        const intervalId = setInterval(fetchAvailableComponents, 30000); // Fetch every 30 seconds
+        return () => clearInterval(intervalId); // Cleanup interval on unmount
     }, []);
 
     const handleComponentChange = (index: number, value: string) => {
@@ -41,7 +57,7 @@ const SetComponentStructure = () => {
         };
 
         try {
-            await apiService.post('/structure', structure);
+            await apiService.post('/components/structure', structure); // Updated API endpoint
             alert('Component structure set successfully');
         } catch (error) {
             console.error('Error setting component structure', error);
@@ -65,8 +81,8 @@ const SetComponentStructure = () => {
                         Component {index + 1}:
                         <select value={component} onChange={e => handleComponentChange(index, e.target.value)} className="form-input">
                             <option value="">Select a component</option>
-                            {availableComponents.map((availableComponent, i) => (
-                                <option key={i} value={availableComponent}>{availableComponent}</option>
+                            {availableComponents && availableComponents.map((availableComponent, i) => (
+                                <option key={i} value={availableComponent.componentName}>{availableComponent.componentName}</option>
                             ))}
                         </select>
                     </label>
