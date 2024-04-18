@@ -42,6 +42,7 @@ const componentMapping: { [key: string]: React.FC<any> } = {
 const Container: React.FC = () => {
     const navigate = useNavigate();
     const [components, setComponents] = useState<string[]>([]);
+    const [activeStructureId, setActiveStructureId] = useState<string | null>(null); // Add this line
 
     useEffect(() => {
         const refreshoken = localStorage.getItem('accessToken');
@@ -63,9 +64,10 @@ const Container: React.FC = () => {
                 // Find the active structure
                 const activeStructure = data.find((structure: ComponentInterface) => structure.active);
 
-                // If an active structure is found, set the components state with its components
-                if (activeStructure) {
+                // If an active structure is found and it's different from the current one, set the components state with its components
+                if (activeStructure && activeStructure.id !== activeStructureId) { // Modify this line
                     setComponents(activeStructure.components);
+                    setActiveStructureId(activeStructure.id); // Add this line
                 }
             } catch (error) {
                 console.error("Unable to fetch component structures.", error);
@@ -75,12 +77,12 @@ const Container: React.FC = () => {
         // Call fetchComponents immediately
         fetchComponents();
 
-        // Then set up an interval to call fetchComponents every 30 seconds
-        const intervalId = setInterval(fetchComponents, 30 * 1000);
+        // Then set up an interval to call fetchComponents every minute
+        const intervalId = setInterval(fetchComponents, 25 * 1000);
 
         // Clear the interval when the component unmounts
         return () => clearInterval(intervalId);
-    }, []);
+    }, [components, activeStructureId]); // Modify this line
 
     useEffect(() => {
         const intervalId = setInterval(() => {
