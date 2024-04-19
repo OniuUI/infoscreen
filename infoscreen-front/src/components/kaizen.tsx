@@ -34,7 +34,7 @@ const TaskColumn: React.FC<TaskProps> = ({ title, tasks, users }) => (
             <div {...provided.droppableProps} ref={provided.innerRef} className="task-column">
                 <h2>{title}</h2>
                 {tasks.map((task: Task, index: number) => (
-                    <Draggable key={task.id} draggableId={task.id} index={index}>
+                    <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
                         {(provided) => (
                             <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                                 <Card
@@ -66,6 +66,7 @@ const Kaizen: React.FC = () => {
 
     const newTasks: Task[] = [
         { id: '1', manager: 'Manager 1', subject: 'Subject 1', dueBy: '2022-12-31', description: 'Description 1', assignedTo: users[0] },
+        { id: '2', manager: 'Manager 1', subject: 'Subject 1', dueBy: '2022-12-31', description: 'Description 1', assignedTo: users[0] },
     ];
     const progressTasks: Task[] = [
         ];
@@ -135,13 +136,9 @@ const Kaizen: React.FC = () => {
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
-            <div className="task-board">
-                <TaskColumn title="New" tasks={newTasks} users={users} />
-                <TaskColumn title="In Progress" tasks={progressTasks} users={users} />
-                <TaskColumn title="Completed" tasks={completedTasks} users={users} />
-                <TaskColumn title="Closed" tasks={closedTasks} users={users} />
-                <TaskColumn title="Canceled" tasks={canceledTasks} users={users} />
-            </div>
+                {columns.map((column, index) => (
+                    <TaskColumn key={index} title={column.title} tasks={column.tasks} users={users} />
+                ))}
         </DragDropContext>
     );
 };

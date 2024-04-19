@@ -2,12 +2,13 @@
 import React from 'react';
 
 interface SquareFieldProps {
+    className?: string;
     children: React.ReactNode;
 }
 
-const SquareField: React.FC<SquareFieldProps> = ({ children }) => {
+const SquareField: React.FC<SquareFieldProps> = ({ className, children }) => {
     return (
-        <div className="square-field">
+        <div className={className}>
             {children}
         </div>
         );

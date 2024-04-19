@@ -102,7 +102,7 @@ const Container: React.FC = () => {
                         {components.map((componentName, index) => {
                             const Component = componentMapping[componentName];
                             return (
-                                <SquareField key={index}>
+                                <SquareField key={index} className={components.length === 1 ? 'full-size' : 'square-field'}>
                                     <Component />
                                 </SquareField>
                             );
