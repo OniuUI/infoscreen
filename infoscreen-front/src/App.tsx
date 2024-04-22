@@ -9,7 +9,7 @@ import Login from "./components/login";
 import Profile from "./components/hub/profile/profile";
 import Hub from "./components/hub/hub";
 import Kaizen from "./components/kaizen";
-
+import Statistics from "./components/statistics";
 
 const App: React.FC = () => {
   return (
@@ -23,6 +23,7 @@ const App: React.FC = () => {
           <Route path="/hub" element={<Hub />} />
           <Route path="/hub/profile" element={<Profile />} />
           <Route path="/kaizen" element={<Kaizen />} />
+          <Route path="/kaizen/statistics" element={<Statistics />} />
         </Routes>
       </div>
     </Router>
