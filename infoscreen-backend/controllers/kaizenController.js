@@ -51,3 +51,71 @@ exports.updateTask = async (req, res) => {
         res.status(500).send({ error: "Unable to update task."  });
     }
 };
+
+// Route to add a comment to a task
+exports.addComment = async (req, res) => {
+    try {
+        const db = getDb();
+        const taskId = req.params.id;
+        const comment = req.body;
+        const result = await db.collection('tasks').updateOne(
+            { id: taskId },
+            { $push: { comments: comment } }
+        );
+        if (result.matchedCount === 0) {
+            return res.status(404).send({ error: 'Task not found.' });
+        }
+        console.log(`Comment added to task with ID: ${taskId}`);
+        res.send({ success: true, comment });
+    } catch (err) {
+        console.log(err)
+        res.status(500).send({ error: "Unable to add comment." });
+    }
+};
+
+exports.editComment = async (req, res) => {
+    try {
+        const db = getDb();
+        const taskId = req.params.taskId;
+        const commentId = req.params.commentId;
+        const updatedComment = req.body;
+
+        const result = await db.collection('tasks').updateOne(
+            { id: taskId, "comments.id": commentId }, // filter
+            { $set: { "comments.$.text": updatedComment.text } } // update
+        );
+
+        if (result.matchedCount === 0) {
+            return res.status(404).send({ error: 'Comment not found.' });
+        }
+
+        console.log(`Comment updated in task with ID: ${taskId}`);
+        res.send({ success: true });
+    } catch (err) {
+        console.log(err)
+        res.status(500).send({ error: "Unable to update comment." });
+    }
+};
+
+exports.deleteComment = async (req, res) => {
+    try {
+        const db = getDb();
+        const taskId = req.params.taskId;
+        const commentId = req.params.commentId;
+
+        const result = await db.collection('tasks').updateOne(
+            { id: taskId }, // filter
+            { $pull: { comments: { id: commentId } } } // update
+        );
+
+        if (result.matchedCount === 0) {
+            return res.status(404).send({ error: 'Comment not found.' });
+        }
+
+        console.log(`Comment deleted from task with ID: ${taskId}`);
+        res.send({ success: true });
+    } catch (err) {
+        console.log(err)
+        res.status(500).send({ error: "Unable to delete comment." });
+    }
+};

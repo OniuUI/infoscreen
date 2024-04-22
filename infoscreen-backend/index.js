@@ -36,6 +36,7 @@ const loginRoutes = require('./routes/loginRoutes');
 const hubRoutes = require('./routes/hubRoutes');
 const componentRoutes = require('./routes/componentRoutes');
 const kaizenRoutes = require('./routes/kaizenRoutes');
+const accessRoutes = require('./routes/accessRoutes');
 
 
 
@@ -103,5 +104,6 @@ app.use('/api/rss', verifyAccessToken, rssRoutes);
 app.use('/api/gallery', verifyAccessToken, galleryRouter);
 app.use('/api/components', verifyAccessToken, componentRoutes);
 app.use('/api/kaizen', verifyAccessToken, kaizenRoutes);
+app.use('/api/access', verifyAccessToken, accessRoutes);
 
 

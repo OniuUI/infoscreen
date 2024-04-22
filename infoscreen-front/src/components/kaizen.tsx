@@ -4,6 +4,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import Card from './taskcard';
 import {apiService} from "./api/apiservice";
 import { v4 as uuidv4 } from 'uuid';
+import { Comment } from './utils/types';
 
 interface User {
     id: string;
@@ -13,13 +14,13 @@ interface User {
 interface Task {
     _id: { $oid: string };
     id: string;
-    manager: string;
+    manager: User;
     subject: string;
     dueBy: string;
     description: string;
     assignedTo: User;
     status: string;
-    comments: string[];
+    comments: Comment[];
 }
 
 interface TaskProps {
@@ -35,23 +36,61 @@ interface Column {
 
 interface completeProps {
     task: Task;
-    manager: string;
+    manager: User;
     subject: string;
     dueBy: string;
     users: User[];
 }
 
-
-
-
+interface User {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    birthdate: string;
+    imageUrl: string;
+    coffee: number;
+    soda: number;
+    email?: string;
+    password?: string;
+    refreshToken?: string;
+}
 
 const Kaizen: React.FC = () => {
     const [newTask, setNewTask] = useState({ manager: '', subject: '', dueBy: '', description: '', assignedTo: '' });
-    const users: User[] = [
-        { id: '1', name: 'User 1' },
-        { id: '2', name: 'User 2' },
-        // Add more users here
-    ];
+    const [users, setUsers] = useState<User[]>([]);
+    const [managersAndAdmins, setManagersAndAdmins] = useState<User[]>([]);
+
+    useEffect(() => {
+        const fetchManagersAndAdmins = async () => {
+            try {
+                const response = await apiService.get('/access/managers');
+                if (Array.isArray(response.users)) {
+                    setManagersAndAdmins(response.users);
+                } else {
+                    console.error('Invalid users data:', response.users);
+                }
+            } catch (error) {
+                console.error('Error fetching users:', error);
+            }
+        };
+        fetchManagersAndAdmins();
+    }, []);
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const response = await apiService.get('/users'); // Replace with your actual endpoint
+                if (Array.isArray(response.users)) {
+                    setUsers(response.users);
+                } else {
+                    console.error('Invalid users data:', response.users);
+                }
+            } catch (error) {
+                console.error('Error fetching users:', error);
+            }
+        };
+        fetchUsers();
+    }, []);
 
     useEffect(() => {
         const fetchTasks = async () => {
@@ -94,13 +133,24 @@ const Kaizen: React.FC = () => {
 
     const handleNewTaskSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
+
+        console.log('newTask.manager:', newTask.manager);
+        console.log('newTask.assignedTo:', newTask.assignedTo);
+        console.log('managersAndAdmins:', managersAndAdmins);
+        console.log('users:', users);
+
         try {
-            const assignedUser = users.find(user => user.id === newTask.assignedTo);
+            const managerUser = managersAndAdmins.find(user => user._id === newTask.manager);
+            if (!managerUser) {
+                console.error('User not found:', newTask.manager);
+                return;
+            }
+            const assignedUser = users.find(user => user._id === newTask.assignedTo);
             if (!assignedUser) {
                 console.error('User not found:', newTask.assignedTo);
                 return;
             }
-            const task = { ...newTask, assignedTo: assignedUser, id: uuidv4(), status: 'New' };
+            const task = { ...newTask, manager: managerUser, assignedTo: assignedUser, id: uuidv4(), status: 'New' };
             const response = await apiService.post('/kaizen/createTask', task);
             console.log('Response:', response);
             if (response.success) {
@@ -119,7 +169,6 @@ const Kaizen: React.FC = () => {
             console.error('Failed to create new task:', error);
         }
     };
-
     const handleStatusChange = async (task: Task, event: React.ChangeEvent<HTMLSelectElement>) => {
         try {
             await apiService.put(`/kaizen/updateTask/${task.id}`, { ...task, status: event.target.value });
@@ -131,7 +180,7 @@ const Kaizen: React.FC = () => {
 
 
     // Add a button for marking the task as complete and a dropdown for changing the status in the Card component
-    const TaskComplete: React.FC<completeProps> = ({ task, users }) => {
+    const TaskComplete: React.FC<completeProps> = ({ task, manager, users }) => {
         const handleComplete = async () => {
             // Update the task's status to 'Completed'
             const updatedTask = { ...task, status: 'Completed' };
@@ -243,6 +292,8 @@ const Kaizen: React.FC = () => {
         setColumns(newColumns);
     };
 
+
+
     const TaskColumn: React.FC<TaskProps> = ({ title, tasks, users }) => (
         <Droppable droppableId={title}>
             {(provided) => (
@@ -254,8 +305,8 @@ const Kaizen: React.FC = () => {
                                 {(provided) => (
                                     <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                                         <Card
-                                            task={task.description}
-                                            manager={task.manager}
+                                            task={task}
+                                            manager={task.manager} // Pass a User object
                                             subject={task.subject}
                                             dueBy={task.dueBy}
                                             users={users}
@@ -281,12 +332,27 @@ const Kaizen: React.FC = () => {
                     <TaskColumn title={column.title} tasks={column.tasks} users={users} />
                     {column.title === 'New' && (
                         <form onSubmit={handleNewTaskSubmit}>
-                            <input type="text" value={newTask.manager} onChange={e => setNewTask(prevTask => ({ ...prevTask, manager: e.target.value }))} placeholder="Manager" required />
-                            <input type="text" value={newTask.subject} onChange={e => setNewTask(prevTask => ({ ...prevTask, subject: e.target.value }))} placeholder="Subject" required />
-                            <input type="date" value={newTask.dueBy} onChange={e => setNewTask(prevTask => ({ ...prevTask, dueBy: e.target.value }))} placeholder="Due By" required />
-                            <textarea value={newTask.description} onChange={e => setNewTask(prevTask => ({ ...prevTask, description: e.target.value }))} placeholder="Description" required />
-                            <select value={newTask.assignedTo} onChange={e => setNewTask(prevTask => ({ ...prevTask, assignedTo: e.target.value }))} required>
-                                {users.map(user => <option key={user.id} value={user.id}>{user.name}</option>)}
+                            <select value={newTask.manager}
+                                    onChange={e => setNewTask(prevTask => ({...prevTask, manager: e.target.value}))}
+                                    required>
+                                {managersAndAdmins.map(user => <option key={user._id}
+                                                                       value={user._id}>{user.firstName} {user.lastName}</option>)}
+                            </select>
+                            <input type="text" value={newTask.subject}
+                                   onChange={e => setNewTask(prevTask => ({...prevTask, subject: e.target.value}))}
+                                   placeholder="Subject" required/>
+                            <input type="date" value={newTask.dueBy}
+                                   onChange={e => setNewTask(prevTask => ({...prevTask, dueBy: e.target.value}))}
+                                   placeholder="Due By" required/>
+                            <textarea value={newTask.description} onChange={e => setNewTask(prevTask => ({
+                                ...prevTask,
+                                description: e.target.value
+                            }))} placeholder="Description" required/>
+                            <select value={newTask.assignedTo}
+                                    onChange={e => setNewTask(prevTask => ({...prevTask, assignedTo: e.target.value}))}
+                                    required>
+                                {users.map(user => <option key={user._id}
+                                                           value={user._id}>{user.firstName} {user.lastName}</option>)}
                             </select>
                             <button type="submit">Create Task</button>
                         </form>
