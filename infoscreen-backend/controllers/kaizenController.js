@@ -17,9 +17,10 @@ exports.createNewTask =  async (req, res) => {
     try {
         const db = getDb();
         const task = req.body;
+        console.log(task)
         const result = await db.collection('tasks').insertOne(task);
         console.log(`Task created with ID: ${result.insertedId}`);
-        res.send({ success: true });
+        res.send({ success: true, task: { ...task, id: result.id } });
     } catch (err) {
         res.status(500).send({ error: "Unable to create task." });
     }
@@ -30,9 +31,13 @@ exports.updateTask = async (req, res) => {
     try {
         const db = getDb();
         const taskId = req.params.id;
-        const updatedTask = req.body;
+        let updatedTask = req.body;
+
+        // Remove the _id field from the updatedTask object
+        delete updatedTask._id;
+
         const result = await db.collection('tasks').updateOne(
-            { _id: taskId }, // filter
+            { id: taskId }, // filter
             { $set: updatedTask }, // update
             { upsert: false } // options
         );
@@ -42,6 +47,7 @@ exports.updateTask = async (req, res) => {
         console.log(`Task updated with ID: ${taskId}`);
         res.send({ success: true });
     } catch (err) {
-        res.status(500).send({ error: "Unable to update task." });
+        console.log(err)
+        res.status(500).send({ error: "Unable to update task."  });
     }
 };

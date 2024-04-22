@@ -3,6 +3,7 @@ import './css/taskboard.css';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import Card from './taskcard';
 import {apiService} from "./api/apiservice";
+import { v4 as uuidv4 } from 'uuid';
 
 interface User {
     id: string;
@@ -99,17 +100,34 @@ const Kaizen: React.FC = () => {
                 return;
             }
             // Create the new task with the user object and a 'New' status
-            const task = { ...newTask, assignedTo: assignedUser, id: Math.random().toString(), status: 'New' };
+            const task = {
+                ...newTask,
+                assignedTo: assignedUser,
+                id: uuidv4(),
+                status: 'New',
+                _id: { $oid: '' }, // Initialize with default value
+                comments: [] // Initialize with default value
+            };
+
+            // Add the new task to the 'New' column immediately
+            setColumns(prevColumns => {
+                const newColumns = [...prevColumns];
+                const newColumn = newColumns.find(column => column.title === 'New');
+                if (newColumn) {
+                    newColumn.tasks = [...newColumn.tasks, task];
+                }
+                return newColumns;
+            });
+
             // Send a POST request to the API endpoint
             const response = await apiService.post('/kaizen/createTask', task);
-            // If the request is successful, add the new task to the 'New' column
-            if (response.data.success) {
-                const newTaskWithId = response.data.task; // assuming the server returns the new task in the response
+            // If the request is not successful, remove the new task from the 'New' column
+            if (!response.data.success) {
                 setColumns(prevColumns => {
                     const newColumns = [...prevColumns];
                     const newColumn = newColumns.find(column => column.title === 'New');
                     if (newColumn) {
-                        newColumn.tasks = [...newColumn.tasks, newTaskWithId];
+                        newColumn.tasks = newColumn.tasks.filter(t => t.id !== task.id);
                     }
                     return newColumns;
                 });
@@ -226,6 +244,9 @@ const Kaizen: React.FC = () => {
 
         // Remove the task from the source column
         sourceColumn.tasks = sourceColumn.tasks.filter((task: Task) => task.id !== draggableId);
+
+        // Update the task's status to match the destination column's title
+        task.status = destinationColumn.title;
 
         // Add the task to the destination column
         destinationColumn.tasks.splice(destination.index, 0, task);
