@@ -20,7 +20,7 @@ exports.createNewTask =  async (req, res) => {
         console.log(task)
         const result = await db.collection('tasks').insertOne(task);
         console.log(`Task created with ID: ${result.insertedId}`);
-        res.send({ success: true, task: { ...task, id: result.id } });
+        res.send({ success: true, task: { ...task, _id: result.insertedId } });
     } catch (err) {
         res.status(500).send({ error: "Unable to create task." });
     }

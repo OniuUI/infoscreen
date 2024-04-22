@@ -43,6 +43,8 @@ interface completeProps {
 
 
 
+
+
 const Kaizen: React.FC = () => {
     const [newTask, setNewTask] = useState({ manager: '', subject: '', dueBy: '', description: '', assignedTo: '' });
     const users: User[] = [
@@ -93,46 +95,25 @@ const Kaizen: React.FC = () => {
     const handleNewTaskSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         try {
-            // Find the user object
             const assignedUser = users.find(user => user.id === newTask.assignedTo);
             if (!assignedUser) {
                 console.error('User not found:', newTask.assignedTo);
                 return;
             }
-            // Create the new task with the user object and a 'New' status
-            const task = {
-                ...newTask,
-                assignedTo: assignedUser,
-                id: uuidv4(),
-                status: 'New',
-                _id: { $oid: '' }, // Initialize with default value
-                comments: [] // Initialize with default value
-            };
-
-            // Add the new task to the 'New' column immediately
-            setColumns(prevColumns => {
-                const newColumns = [...prevColumns];
-                const newColumn = newColumns.find(column => column.title === 'New');
-                if (newColumn) {
-                    newColumn.tasks = [...newColumn.tasks, task];
-                }
-                return newColumns;
-            });
-
-            // Send a POST request to the API endpoint
+            const task = { ...newTask, assignedTo: assignedUser, id: uuidv4(), status: 'New' };
             const response = await apiService.post('/kaizen/createTask', task);
-            // If the request is not successful, remove the new task from the 'New' column
-            if (!response.data.success) {
+            console.log('Response:', response);
+            if (response.success) {
+                const newTaskWithId = response.task;
                 setColumns(prevColumns => {
-                    const newColumns = [...prevColumns];
-                    const newColumn = newColumns.find(column => column.title === 'New');
-                    if (newColumn) {
-                        newColumn.tasks = newColumn.tasks.filter(t => t.id !== task.id);
-                    }
-                    return newColumns;
+                    return prevColumns.map(column => {
+                        if (column.title === 'New') {
+                            return { ...column, tasks: [...column.tasks, newTaskWithId] };
+                        }
+                        return column;
+                    });
                 });
             }
-            // Clear the form
             setNewTask({ manager: '', subject: '', dueBy: '', description: '', assignedTo: '' });
         } catch (error) {
             console.error('Failed to create new task:', error);
@@ -150,35 +131,35 @@ const Kaizen: React.FC = () => {
 
 
     // Add a button for marking the task as complete and a dropdown for changing the status in the Card component
-    const TaskComplete: React.FC<completeProps> = ({ task, manager, subject, dueBy, users }) => {
+    const TaskComplete: React.FC<completeProps> = ({ task, users }) => {
         const handleComplete = async () => {
+            // Update the task's status to 'Completed'
+            const updatedTask = { ...task, status: 'Completed' };
+
+            // Update the task in the backend
             try {
-                // Update the task status in the backend
-                const response = await apiService.put(`/kaizen/updateTask/${task.id}`, { ...task, status: 'Completed' });
-                if (response.data.success) {
-                    // Move the task to the 'Completed' column in the frontend
-                    setColumns(prevColumns => {
-                        const newColumns = prevColumns.map(column => {
-                            if (column.title === task.status) {
-                                // Remove the task from its current column
-                                return { ...column, tasks: column.tasks.filter(t => t.id !== task.id) };
-                            } else if (column.title === 'Completed') {
-                                // Add the task to the 'Completed' column
-                                return { ...column, tasks: [...column.tasks, { ...task, status: 'Completed' }] };
-                            } else {
-                                return column;
-                            }
-                        });
-                        return newColumns;
-                    });
-                } else {
-                    console.error('Failed to update task status in the backend:', response.data.message);
-                }
+                await apiService.put(`/kaizen/updateTask/${task.id}`, updatedTask);
             } catch (error) {
-                console.error('Failed to mark task as complete:', error);
+                console.error('Failed to update task:', error);
+                return;
             }
+
+            // Move the task to the 'Completed' column in the frontend
+            setColumns(prevColumns => {
+                const newColumns = prevColumns.map(column => {
+                    if (column.title === task.status) {
+                        // Remove the task from its current column
+                        return { ...column, tasks: column.tasks.filter(t => t.id !== task.id) };
+                    } else if (column.title === 'Completed') {
+                        // Add the task to the 'Completed' column
+                        return { ...column, tasks: [...column.tasks, updatedTask] };
+                    }
+                    return column;
+                });
+                return newColumns;
+            });
         };
-        // Return a JSX element
+
         return (
             <button onClick={handleComplete}>Complete Task</button>
         );
@@ -268,20 +249,22 @@ const Kaizen: React.FC = () => {
                 <div {...provided.droppableProps} ref={provided.innerRef} className="task-column">
                     <h2>{title}</h2>
                     {tasks.map((task: Task, index: number) => (
-                        <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
-                            {(provided) => (
-                                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                    <Card
-                                        task={task.description}
-                                        manager={task.manager}
-                                        subject={task.subject}
-                                        dueBy={task.dueBy}
-                                        users={users}
-                                    />
-                                    <TaskComplete task={task} manager={task.manager} subject={task.subject} dueBy={task.dueBy} users={users}/>
-                                </div>
-                            )}
-                        </Draggable>
+                        task && task.id ? (
+                            <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
+                                {(provided) => (
+                                    <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                        <Card
+                                            task={task.description}
+                                            manager={task.manager}
+                                            subject={task.subject}
+                                            dueBy={task.dueBy}
+                                            users={users}
+                                        />
+                                        <TaskComplete task={task} manager={task.manager} subject={task.subject} dueBy={task.dueBy} users={users}/>
+                                    </div>
+                                )}
+                            </Draggable>
+                        ) : null
                     ))}
                     {provided.placeholder}
                 </div>
