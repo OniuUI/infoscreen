@@ -1,0 +1,67 @@
+:root {
+    --celestial-blue: #549ac0ff;
+    --dim-gray: #6a6a6aff;
+    --raw-umber: #966e3eff;
+    --jet: #2c2b2bff;
+    --tea-green: #d1de98ff;
+}
+
+.task-board {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+    gap: 20px;
+    width: 100%;
+    background-color: var(--jet); /* Dark background */
+}
+
+.task-column {
+    flex: 1;
+    border: 1px solid var(--dim-gray);
+    border-radius: 5px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+    width: 350px;
+    color: var(--celestial-blue); /* Blue text */
+}
+
+.task-column h2 {
+    margin-bottom: 20px;
+    text-align: center;
+    color: var(--tea-green); /* Green text */
+}
+
+/* Other components */
+.task-form {
+    margin-top: 20px;
+}
+
+.task-form input,
+.task-form select,
+.task-form textarea {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--dim-gray);
+    background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+    color: var(--raw-umber); /* Brown text */
+}
+
+.task-form button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--celestial-blue);
+    color: var(--tea-green);
+    cursor: pointer;
+}
+
+.task-form button:hover {
+    background-color: var(--raw-umber);
+}
+
+.complete-task-button {
+    background-color: lightgreen;
+}

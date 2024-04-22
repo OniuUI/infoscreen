@@ -34,6 +34,18 @@ exports.updateTask = async (req, res) => {
         const taskId = req.params.id;
         let updatedTask = req.body;
 
+        // Extract userIdent and role from the request
+        const userIdent = req.query.userIdent;
+        const role = req.query.role;
+
+        // Get the task from the database
+        const task = await db.collection('tasks').findOne({ id: taskId });
+
+        // Check if the user has the right permissions
+        if (role !== 'admin' && userIdent !== task.manager._id) {
+            return res.status(403).send({ error: 'You do not have the right permissions to update this task.' });
+        }
+
         // Remove the _id field from the updatedTask object
         delete updatedTask._id;
 

@@ -5,6 +5,7 @@ import Card from './taskcard';
 import {apiService} from "./api/apiservice";
 import { v4 as uuidv4 } from 'uuid';
 import { Comment } from './utils/types';
+import './css/kaizen.css'
 
 interface User {
     id: string;
@@ -59,6 +60,26 @@ const Kaizen: React.FC = () => {
     const [newTask, setNewTask] = useState({ manager: '', subject: '', dueBy: '', description: '', assignedTo: '' });
     const [users, setUsers] = useState<User[]>([]);
     const [managersAndAdmins, setManagersAndAdmins] = useState<User[]>([]);
+    const [userRole, setUserRole] = useState('');
+    const [userIdent, setUserIdent] = useState('');
+
+    useEffect(() => {
+        // Retrieve userIdent from local storage
+        const ident = localStorage.getItem('userIdent');
+
+        // Set the userIdent state
+        setUserIdent(ident || '');
+    }, []);
+
+    useEffect(() => {
+        // Other fetch functions...
+
+        // Retrieve userRole from local storage
+        const role = localStorage.getItem('userRole');
+
+        // Set the userRole state
+        setUserRole(role || '');
+    }, []);
 
     useEffect(() => {
         const fetchManagersAndAdmins = async () => {
@@ -134,10 +155,6 @@ const Kaizen: React.FC = () => {
     const handleNewTaskSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
-        console.log('newTask.manager:', newTask.manager);
-        console.log('newTask.assignedTo:', newTask.assignedTo);
-        console.log('managersAndAdmins:', managersAndAdmins);
-        console.log('users:', users);
 
         try {
             const managerUser = managersAndAdmins.find(user => user._id === newTask.manager);
@@ -230,7 +247,7 @@ const Kaizen: React.FC = () => {
         };
 
         return (
-            <button onClick={handleComplete}>Complete Task</button>
+            <button className="complete-task-button" onClick={handleComplete}>Complete Task</button>
         );
     };
 
@@ -323,7 +340,7 @@ const Kaizen: React.FC = () => {
                         task && task.id ? (
                             <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
                                 {(provided) => (
-                                    <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                    <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="card">
                                         <Card
                                             task={task}
                                             manager={task.manager}
@@ -348,38 +365,41 @@ const Kaizen: React.FC = () => {
     return (
         <DragDropContext onDragEnd={onDragEnd}>
             <div className="task-board">
-            {columns.map((column, index) => (
-                <div key={index}>
-                    <TaskColumn title={column.title} tasks={column.tasks} users={users} />
-                    {column.title === 'New' && (
-                        <form onSubmit={handleNewTaskSubmit}>
-                            <select value={newTask.manager}
-                                    onChange={e => setNewTask(prevTask => ({...prevTask, manager: e.target.value}))}
-                                    required>
-                                {managersAndAdmins.map(user => <option key={user._id}
-                                                                       value={user._id}>{user.firstName} {user.lastName}</option>)}
-                            </select>
-                            <input type="text" value={newTask.subject}
-                                   onChange={e => setNewTask(prevTask => ({...prevTask, subject: e.target.value}))}
-                                   placeholder="Subject" required/>
-                            <input type="date" value={newTask.dueBy}
-                                   onChange={e => setNewTask(prevTask => ({...prevTask, dueBy: e.target.value}))}
-                                   placeholder="Due By" required/>
-                            <textarea value={newTask.description} onChange={e => setNewTask(prevTask => ({
-                                ...prevTask,
-                                description: e.target.value
-                            }))} placeholder="Description" required/>
-                            <select value={newTask.assignedTo}
-                                    onChange={e => setNewTask(prevTask => ({...prevTask, assignedTo: e.target.value}))}
-                                    required>
-                                {users.map(user => <option key={user._id}
-                                                           value={user._id}>{user.firstName} {user.lastName}</option>)}
-                            </select>
-                            <button type="submit">Create Task</button>
-                        </form>
-                    )}
-                </div>
-            ))}
+                {columns.map((column, index) => (
+                    <div key={index}>
+                        <TaskColumn title={column.title} tasks={column.tasks} users={users} />
+                        {column.title === 'New' && (userRole === 'admin' || userRole === 'manager') && (
+                            <form onSubmit={handleNewTaskSubmit} className="task-form">
+                                <select value={newTask.manager}
+                                        onChange={e => setNewTask(prevTask => ({...prevTask, manager: e.target.value}))}
+                                        required>
+                                    {managersAndAdmins.map(user => <option key={user._id}
+                                                                           value={user._id}>{user.firstName} {user.lastName}</option>)}
+                                </select>
+                                <input type="text" value={newTask.subject}
+                                       onChange={e => setNewTask(prevTask => ({...prevTask, subject: e.target.value}))}
+                                       placeholder="Subject" required
+                                />
+                                <input type="date" value={newTask.dueBy}
+                                       onChange={e => setNewTask(prevTask => ({...prevTask, dueBy: e.target.value}))}
+                                       placeholder="Due By" required
+                                />
+                                <textarea value={newTask.description} onChange={e => setNewTask(prevTask => ({
+                                    ...prevTask,
+                                    description: e.target.value
+                                }))} placeholder="Description" required
+                                />
+                                <select value={newTask.assignedTo}
+                                        onChange={e => setNewTask(prevTask => ({...prevTask, assignedTo: e.target.value}))}
+                                        required>
+                                    {users.map(user => <option key={user._id}
+                                                               value={user._id}>{user.firstName} {user.lastName}</option>)}
+                                </select>
+                                <button type="submit" >Create Task</button>
+                            </form>
+                        )}
+                    </div>
+                ))}
             </div>
         </DragDropContext>
     );

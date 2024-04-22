@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from 'react';
+import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import {apiService} from "./api/apiservice";
 import { v4 as uuidv4 } from 'uuid';
+import './css/taskcard.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import CommentBox from "./commentbox";
+import {User, Task} from'./utils/types';
 
-interface User {
-    _id: string;
-    firstName: string;
-    lastName: string;
 
-}
 
 interface CardProps {
     users: User[];
@@ -24,30 +24,26 @@ interface Comment {
     author: string;
 }
 
-interface Task {
-    _id: { $oid: string };
-    id: string;
-    manager: User;
-    subject: string;
-    dueBy: string;
-    description: string;
-    assignedTo: User;
-    status: string;
-    comments: Comment[];
-}
 
 interface CommentProps {
     comment: Comment;
     task: Task;
     handleEditComment: (task: Task, commentId: string, newText: string) => void;
     handleDeleteComment: (task: Task, commentId: string) => void;
+    setComments: React.Dispatch<React.SetStateAction<Comment[]>>; // Add this line
 }
 
-const Comment: React.FC<CommentProps> = ({ comment, task, handleEditComment, handleDeleteComment }) => {
+const Comment: React.FC<CommentProps> = ({ setComments, comment, task, handleEditComment, handleDeleteComment }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editedText, setEditedText] = useState(comment.text);
-    const userIdent = localStorage.getItem('userIdent');
-    const role = localStorage.getItem('role');
+
+    // Add a new state variable for the dropdown menu visibility
+    const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
+    // Function to toggle the dropdown menu visibility
+    const toggleDropdown = () => {
+        setIsDropdownVisible(!isDropdownVisible);
+    };
 
     const handleEdit = () => {
         setIsEditing(true);
@@ -56,33 +52,110 @@ const Comment: React.FC<CommentProps> = ({ comment, task, handleEditComment, han
     const handleSave = () => {
         handleEditComment(task, comment.id, editedText);
         setIsEditing(false);
+        setComments((prevComments: Comment[]) => prevComments.map((c: Comment) => c.id === comment.id ? {...c, text: editedText} : c)); // Update the comments state
     };
 
     const handleDelete = () => {
         handleDeleteComment(task, comment.id);
+        setComments((prevComments: Comment[]) => prevComments.filter((c: Comment) => c.id !== comment.id)); // Update the comments state
     };
-
+    // Add useEffect hook here
+    useEffect(() => {
+        // Update the editedText state whenever the comment.text prop changes
+        setEditedText(comment.text);
+    }, [comment.text]);
     return (
-        <div>
-            {isEditing ? (
-                <div>
-                    <input type="text" value={editedText} onChange={e => setEditedText(e.target.value)} />
-                    <button onClick={handleSave}>Save</button>
-                </div>
-            ) : (
-                <p>{comment.text} - {comment.author}</p>
-            )}
-            <div>
-                <button onClick={handleEdit}>Edit</button>
-                <button onClick={handleDelete}>Delete</button>
+        <div className="comment">
+            <div className="comment__content">
+                {isEditing ? (
+                    <div>
+                        <input type="text" value={editedText} onChange={e => setEditedText(e.target.value)}/>
+                        <button onClick={handleSave}>Save</button>
+                    </div>
+                ) : (
+                    <p className="comment__text"><span
+                        className="comment__author">{comment.author}</span> - {comment.text}
+                    </p>
+                )}
+            </div>
+            <div className="comment__actions">
+                <FontAwesomeIcon icon={isDropdownVisible ? faChevronUp : faChevronDown} onClick={toggleDropdown}/>
+                {isDropdownVisible && (  // Dropdown menu
+                    <div className="dropdown-menu">
+                        <div className="dropdown-item" onClick={() => {
+                            handleEdit();
+                            toggleDropdown();
+                        }}>Edit
+                        </div>
+                        <div className="dropdown-item" onClick={() => {
+                            handleDelete();
+                            toggleDropdown();
+                        }}>Delete
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
 };
 
-const Card: React.FC<CardProps> = ({ users, task: initialTask, manager, subject, dueBy, handleDeleteTask }) => {
+
+
+const Card: React.FC<CardProps> = ({users, task: initialTask, manager, subject, dueBy, handleDeleteTask}) => {
     const [task, setTask] = useState<Task>(initialTask);
     const [selectedUser, setSelectedUser] = useState<string>(task.assignedTo._id);
+    const [editedSubject, setEditedSubject] = useState(task.subject);
+    const [editedDescription, setEditedDescription] = useState(task.description);
+    const [editedDueBy, setEditedDueBy] = useState(task.dueBy);
+    const userIdent = localStorage.getItem('userIdent');
+    const userRole = localStorage.getItem('userRole');
+    const [comments, setComments] = useState(task.comments);
+
+    const handleSubjectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setEditedSubject(event.target.value);
+    };
+
+    const handleDescriptionChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setEditedDescription(event.target.value);
+    };
+
+    const handleSubjectBlur = async () => {
+        // Make an API call to update the task
+        const updatedTask = {...task, subject: editedSubject};
+        try {
+            await apiService.put(`/kaizen/updateTask/${task.id}?userIdent=${userIdent}`, updatedTask);
+            setTask(updatedTask);
+        } catch (error) {
+            console.error('Failed to update task:', error);
+        }
+    };
+
+    const handleDescriptionBlur = async () => {
+        // Make an API call to update the task
+        const updatedTask = { ...task, description: editedDescription };
+        try {
+            await apiService.put(`/kaizen/updateTask/${task.id}?userIdent=${userIdent}`, updatedTask);
+            setTask(updatedTask);
+        } catch (error) {
+            console.error('Failed to update task:', error);
+        }
+    };
+
+    const handleDueByChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setEditedDueBy(event.target.value);
+    };
+
+    const handleDueByBlur = async () => {
+        // Make an API call to update the task
+        const updatedTask = { ...task, dueBy: editedDueBy };
+        try {
+            await apiService.put(`/kaizen/updateTask/${task.id}?userIdent=${userIdent}`, updatedTask);
+            setTask(updatedTask);
+        } catch (error) {
+            console.error('Failed to update task:', error);
+        }
+    };
+
     const handleDelete = () => {
         handleDeleteTask(task.id);
     };
@@ -105,19 +178,18 @@ const Card: React.FC<CardProps> = ({ users, task: initialTask, manager, subject,
     };
 
     const assignedUser = users.find(user => user._id === selectedUser);
-    const [newComment, setNewComment] = useState('');
 
-    const handleAddComment = async (event: React.FormEvent) => {
-        event.preventDefault();
+    const handleAddComment = async (commentText: string) => {
         try {
-            const comment = { id: uuidv4(), text: newComment, author: 'User' }; // Replace 'User' with the actual user
+            const comment = { id: uuidv4(), text: commentText, author: 'User' }; // Replace 'User' with the actual user
             const response = await apiService.post(`/kaizen/addComment/${task.id}`, comment);
             console.log('Response:', response);
             if (response.success) {
-                // Add the new comment to the task in the frontend
-                task.comments.push(response.comment);
+                // Add the new comment to the comments state
+                setComments(prevComments => [...prevComments, response.comment]);
+                // Also update the task state
+                setTask(prevTask => ({...prevTask, comments: [...prevTask.comments, response.comment]}));
             }
-            setNewComment('');
         } catch (error) {
             console.error('Failed to add comment:', error);
         }
@@ -160,41 +232,48 @@ const Card: React.FC<CardProps> = ({ users, task: initialTask, manager, subject,
 
     return (
         <div className="card">
-            <h3>{subject}</h3>
-            <p>{task.description}</p>
-            <p>Manager: {task.manager ? `${task.manager.firstName} ${task.manager.lastName}` : 'Unassigned'}</p>
-            <label>
-                Assigned to:
-                <select value={selectedUser} onChange={handleUserChange}>
-                    {users.map((user) => (
-                        <option key={user._id} value={user._id}>
-                            {user.firstName} {user.lastName}
-                        </option>
-                    ))}
-                </select>
-            </label>
-            <p>Assigned To: {assignedUser ? `${assignedUser.firstName} ${assignedUser.lastName}` : 'Unassigned'}</p>
-            <label>
-                Due by:
-                <input type="date" defaultValue={dueBy}/>
-            </label>
-            <form onSubmit={handleAddComment}>
-                <input type="text" value={newComment} onChange={e => setNewComment(e.target.value)}
-                       placeholder="Add a comment" required/>
-                <button type="submit">Add Comment</button>
-            </form>
-            {task.comments && task.comments.map((comment: Comment) => (
-                <Comment
-                    key={comment.id}
-                    comment={comment}
-                    task={task}
-                    handleEditComment={handleEditComment}
-                    handleDeleteComment={handleDeleteComment}
-                />
-            ))}
-            {((task.manager._id === manager._id) || (localStorage.getItem("role") === 'Admin')) && (
-                <button onClick={handleDelete}>Delete</button>
-            )}
+            <div className="card__header">
+                <input type="text" value={editedSubject} onChange={handleSubjectChange} onBlur={handleSubjectBlur}
+                       readOnly={userRole !== 'admin' && userIdent !== task.manager._id}/>
+            </div>
+            <div className="card__body">
+                Description:
+                <textarea value={editedDescription} onChange={handleDescriptionChange} onBlur={handleDescriptionBlur}
+                          readOnly={userRole !== 'admin' && userIdent !== task.manager._id}/>
+                <p>Manager: {task.manager ? `${task.manager.firstName} ${task.manager.lastName}` : 'Unassigned'}</p>
+                <label>
+                    Assigned to:
+                    <select value={selectedUser} onChange={handleUserChange}>
+                        {users.map((user) => (
+                            <option key={user._id} value={user._id}>
+                                {user.firstName} {user.lastName}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+                <p>Assigned To: {assignedUser ? `${assignedUser.firstName} ${assignedUser.lastName}` : 'Unassigned'}</p>
+                <label>
+                    Due by:
+                    <input type="date" value={editedDueBy} onChange={handleDueByChange} onBlur={handleDueByBlur}
+                           readOnly={userRole !== 'admin' && userIdent !== task.manager._id}/>
+                </label>
+                <CommentBox task={task} handleAddComment={handleAddComment} comments={comments} setComments={setComments} />
+                {task.comments && task.comments.map((comment: Comment) => (
+                    <Comment
+                        key={comment.id}
+                        comment={comment}
+                        task={task}
+                        handleEditComment={handleEditComment}
+                        handleDeleteComment={handleDeleteComment}
+                        setComments={setComments} // Pass down the setComments function
+                    />
+                ))}
+            </div>
+            <div className="card__footer">
+                {((task.manager._id === manager._id) || (localStorage.getItem("role") === 'Admin')) && (
+                    <button className="delete-button" onClick={handleDelete}>Delete</button>
+                )}
+            </div>
         </div>
     );
 };

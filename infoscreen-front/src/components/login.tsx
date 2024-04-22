@@ -36,7 +36,7 @@ const Login = () => {
         localStorage.setItem('accessToken', response.data.accessToken);
         localStorage.setItem('refreshToken', response.data.refreshToken);
         localStorage.setItem('userIdent', response.data.userIdent);
-        localStorage.setItem('role', response.data.role); // Set the role in local storage
+        localStorage.setItem('userRole', response.data.role); // Set the role in local storage
 
         if(logoutTimer) {
           clearTimeout(logoutTimer);
@@ -46,7 +46,7 @@ const Login = () => {
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
           localStorage.removeItem('userIdent');
-          localStorage.removeItem('role'); // Remove the role from local storage when the token expires
+          localStorage.removeItem('userRole'); // Remove the role from local storage when the token expires
         }, response.data.expiresIn * 1000);
 
         setIsLoginSuccess(true);
