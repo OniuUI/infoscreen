@@ -1,4 +1,6 @@
 // backend
+const roleController = require('../controllers/accessController');
+
 const jwt = require('jsonwebtoken');
 const userController = require('./userController');
 const bcrypt = require('bcrypt');
@@ -50,8 +52,10 @@ exports.login = async (req, res) => {
         return res.status(401).send({ message: 'Invalid email or password' });
     }
 
+    // Fetch the role of the user
+    const role = await roleController.getRoleByUserId(user._id);
+
     // Create tokens
-    console.log("Authenticating")
     const accessToken = generateAccessToken(user._id);
     const refreshToken = jwt.sign({ userId: user._id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
     const userIdent = user._id;
@@ -63,13 +67,12 @@ exports.login = async (req, res) => {
     user.refreshToken = refreshToken;
     await userController.updateUserById(user._id, user);
 
-    console.log("User authenticated")
-
     res.send({
         accessToken,
         refreshToken,
         userIdent,
-        expiresIn: accessTokenExpiration // Now expiresIn represents the timestamp at which the access token will expire
+        role, // Include the role in the response
+        expiresIn: accessTokenExpiration
     });
 };
 

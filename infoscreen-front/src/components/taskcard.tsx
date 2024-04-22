@@ -15,6 +15,7 @@ interface CardProps {
     manager: User;
     subject: string;
     dueBy: string;
+    handleDeleteTask: (taskId: string) => void;
 }
 
 interface Comment {
@@ -45,6 +46,8 @@ interface CommentProps {
 const Comment: React.FC<CommentProps> = ({ comment, task, handleEditComment, handleDeleteComment }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editedText, setEditedText] = useState(comment.text);
+    const userIdent = localStorage.getItem('userIdent');
+    const role = localStorage.getItem('role');
 
     const handleEdit = () => {
         setIsEditing(true);
@@ -77,9 +80,12 @@ const Comment: React.FC<CommentProps> = ({ comment, task, handleEditComment, han
     );
 };
 
-const Card: React.FC<CardProps> = ({ users, task: initialTask, manager, subject, dueBy }) => {
+const Card: React.FC<CardProps> = ({ users, task: initialTask, manager, subject, dueBy, handleDeleteTask }) => {
     const [task, setTask] = useState<Task>(initialTask);
     const [selectedUser, setSelectedUser] = useState<string>(task.assignedTo._id);
+    const handleDelete = () => {
+        handleDeleteTask(task.id);
+    };
 
     const handleUserChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedUser(event.target.value);
@@ -137,7 +143,6 @@ const Card: React.FC<CardProps> = ({ users, task: initialTask, manager, subject,
     };
 
 
-
     const handleDeleteComment = async (task: Task, commentId: string) => {
         try {
             const response = await apiService.delete(`/kaizen/deleteComment/${task.id}/${commentId}`);
@@ -187,6 +192,9 @@ const Card: React.FC<CardProps> = ({ users, task: initialTask, manager, subject,
                     handleDeleteComment={handleDeleteComment}
                 />
             ))}
+            {((task.manager._id === manager._id) || (localStorage.getItem("role") === 'Admin')) && (
+                <button onClick={handleDelete}>Delete</button>
+            )}
         </div>
     );
 };

@@ -15,3 +15,19 @@ exports.getManagersAndAdmins = async (req, res) => {
         res.status(500).send({ error: "Unable to fetch users." });
     }
 };
+
+exports.getRoleByUserId = async (userId) => {
+    try {
+        const db = getDb();
+        const roleDocument = await db.collection('roles').findOne({ userId: userId });
+
+        if (!roleDocument) {
+            throw new Error('No role found for this user');
+        }
+
+        return roleDocument.role;
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
+};

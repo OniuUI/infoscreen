@@ -30,23 +30,23 @@ const Login = () => {
         email,
         password,
       });
-      console.log(response)
-      // If successful, store the auth tokens
+
+      // If successful, store the auth tokens and role
       if (response.data) {
-        console.log("Setting tokens")
         localStorage.setItem('accessToken', response.data.accessToken);
         localStorage.setItem('refreshToken', response.data.refreshToken);
         localStorage.setItem('userIdent', response.data.userIdent);
+        localStorage.setItem('role', response.data.role); // Set the role in local storage
 
         if(logoutTimer) {
           clearTimeout(logoutTimer);
         }
 
         logoutTimer = setTimeout(() => {
-          console.log("Token expired, access denied")
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
           localStorage.removeItem('userIdent');
+          localStorage.removeItem('role'); // Remove the role from local storage when the token expires
         }, response.data.expiresIn * 1000);
 
         setIsLoginSuccess(true);

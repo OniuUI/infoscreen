@@ -1,3 +1,4 @@
+const accessController = require('./accessController');
 const {getDb} = require("../db");
 
 // Route to fetch existing tasks
@@ -117,5 +118,34 @@ exports.deleteComment = async (req, res) => {
     } catch (err) {
         console.log(err)
         res.status(500).send({ error: "Unable to delete comment." });
+    }
+};
+
+exports.deleteTask = async (req, res) => {
+    try {
+        const db = getDb();
+        const taskId = req.params.id;
+        const userIdent = req.query.userIdent; // Extract userIdent from the query parameters
+
+        // Get the role of the user
+        const role = await accessController.getRoleByUserId(userIdent);
+
+        // Check if the user has the right permissions
+        if (role !== 'admin' && role !== 'manager') {
+            return res.status(403).send({ error: 'You do not have the right permissions to delete this task.' });
+        }
+
+        // Delete the task
+        const result = await db.collection('tasks').deleteOne({ id: taskId });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).send({ error: 'Task not found.' });
+        }
+
+        console.log(`Task deleted with ID: ${taskId}`);
+        res.send({ success: true });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ error: "Unable to delete task." });
     }
 };

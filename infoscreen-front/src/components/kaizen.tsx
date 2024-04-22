@@ -178,6 +178,26 @@ const Kaizen: React.FC = () => {
         }
     };
 
+    const handleDeleteTask = async (taskId: string) => {
+        try {
+            // Retrieve userIdent from local storage
+            const userIdent = localStorage.getItem('userIdent');
+
+            // Send a DELETE request to the backend
+            await apiService.delete(`/kaizen/deleteTask/${taskId}?userIdent=${userIdent}`);
+
+            // Create a new columns array with new objects and new tasks arrays
+            const newColumns = columns.map(column => ({
+                ...column,
+                tasks: column.tasks.filter(task => task.id !== taskId),
+            }));
+
+            // Update the state
+            setColumns(newColumns);
+        } catch (error) {
+            console.error('Failed to delete task:', error);
+        }
+    };
 
     // Add a button for marking the task as complete and a dropdown for changing the status in the Card component
     const TaskComplete: React.FC<completeProps> = ({ task, manager, users }) => {
@@ -306,10 +326,11 @@ const Kaizen: React.FC = () => {
                                     <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                                         <Card
                                             task={task}
-                                            manager={task.manager} // Pass a User object
+                                            manager={task.manager}
                                             subject={task.subject}
                                             dueBy={task.dueBy}
                                             users={users}
+                                            handleDeleteTask={handleDeleteTask}
                                         />
                                         <TaskComplete task={task} manager={task.manager} subject={task.subject} dueBy={task.dueBy} users={users}/>
                                     </div>
