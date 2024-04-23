@@ -98,22 +98,6 @@ const Card: React.FC<CardProps> = ({users, task, manager, subject, dueBy, handle
 
     const assignedUser = users.find(user => user._id === selectedUser);
 
-    const handleAddComment = async (commentText: string) => {
-        try {
-            const comment = { id: uuidv4(), text: commentText, author: 'User' }; // Replace 'User' with the actual user
-            const response = await apiService.post(`/kaizen/addComment/${localTask.id}`, comment);
-            console.log('Response:', response);
-            if (response.success) {
-                // Update the task state with the new comment
-                localTask.comments.push(response.comment);
-                console.log(localTask.comments)
-                console.log(response.comment)
-                //setTask((prevTask: Task) => ({...prevTask, comments: [...prevTask.comments, response.comment]}));
-            }
-        } catch (error) {
-            console.error('Failed to add comment:', error);
-        }
-    };
 
     return (
         <div className="card">
@@ -142,7 +126,7 @@ const Card: React.FC<CardProps> = ({users, task, manager, subject, dueBy, handle
                     <input type="date" value={editedDueBy} onChange={handleDueByChange} onBlur={handleDueByBlur}
                            readOnly={userRole !== 'admin' && userIdent !== localTask.manager._id}/>
                 </label>
-                <CommentBox handleAddComment={handleAddComment} />
+                <CommentBox task={localTask} setTask={setLocalTask} />
                 {localTask.comments && localTask.comments.map((comment: Comment) => (
                     <CommentEntry
                         setTask={setLocalTask}
