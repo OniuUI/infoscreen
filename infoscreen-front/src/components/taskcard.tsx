@@ -41,7 +41,7 @@ const Card: React.FC<CardProps> = ({users, task, manager, subject, dueBy, handle
         // Make an API call to update the task
         const updatedTask = {...task, subject: editedSubject};
         try {
-            await apiService.put(`/kaizen/updateTask/${task.id}?userIdent=${userIdent}`, updatedTask);
+            await apiService.put(`/kaizen/updateTask/${task.id}?userIdent=${userIdent}&role=${userRole}`, updatedTask);
             //setTask(updatedTask);
         } catch (error) {
             console.error('Failed to update task:', error);
@@ -52,7 +52,7 @@ const Card: React.FC<CardProps> = ({users, task, manager, subject, dueBy, handle
         // Make an API call to update the task
         const updatedTask = { ...localTask, description: editedDescription };
         try {
-            await apiService.put(`/kaizen/updateTask/${localTask.id}?userIdent=${userIdent}`, updatedTask);
+            await apiService.put(`/kaizen/updateTask/${localTask.id}?userIdent=${userIdent}&role=${userRole}`, updatedTask);
             setLocalTask(updatedTask)
             //setTask(updatedTask);
         } catch (error) {
@@ -68,7 +68,7 @@ const Card: React.FC<CardProps> = ({users, task, manager, subject, dueBy, handle
         // Make an API call to update the task
         const updatedTask = { ...localTask, dueBy: editedDueBy };
         try {
-            await apiService.put(`/kaizen/updateTask/${localTask.id}?userIdent=${userIdent}`, updatedTask);
+            await apiService.put(`/kaizen/updateTask/${localTask.id}?userIdent=${userIdent}&role=${userRole}`, updatedTask);
             //setTask(updatedTask);
         } catch (error) {
             console.error('Failed to update task:', error);

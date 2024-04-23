@@ -6,6 +6,8 @@ import {apiService} from "./api/apiservice";
 import { v4 as uuidv4 } from 'uuid';
 import {User, Task, Comment } from './utils/types';
 import './css/kaizen.css'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faMinus, faPlus} from '@fortawesome/free-solid-svg-icons';
 
 interface TaskProps {
     title: string;
@@ -33,6 +35,7 @@ const Kaizen: React.FC = () => {
     const [managersAndAdmins, setManagersAndAdmins] = useState<User[]>([]);
     const [userRole, setUserRole] = useState('');
     const [userIdent, setUserIdent] = useState('');
+    const [showForm, setShowForm] = useState(false);
 
     useEffect(() => {
         // Retrieve userIdent from local storage
@@ -58,6 +61,9 @@ const Kaizen: React.FC = () => {
                 const response = await apiService.get('/access/managers');
                 if (Array.isArray(response.users)) {
                     setManagersAndAdmins(response.users);
+                    if (response.users.length > 0) {
+                        setNewTask(prevTask => ({ ...prevTask, manager: response.users[0]._id }));
+                    }
                 } else {
                     console.error('Invalid users data:', response.users);
                 }
@@ -74,6 +80,9 @@ const Kaizen: React.FC = () => {
                 const response = await apiService.get('/users'); // Replace with your actual endpoint
                 if (Array.isArray(response.users)) {
                     setUsers(response.users);
+                    if (response.users.length > 0) {
+                        setNewTask(prevTask => ({ ...prevTask, assignedTo: response.users[0]._id }));
+                    }
                 } else {
                     console.error('Invalid users data:', response.users);
                 }
@@ -344,34 +353,39 @@ const Kaizen: React.FC = () => {
                     <div key={index}>
                         <TaskColumn title={column.title} tasks={column.tasks} users={users} />
                         {column.title === 'New' && (userRole === 'admin' || userRole === 'manager') && (
-                            <form onSubmit={handleNewTaskSubmit} className="task-form">
-                                <select value={newTask.manager}
-                                        onChange={e => setNewTask(prevTask => ({...prevTask, manager: e.target.value}))}
-                                        required>
-                                    {managersAndAdmins.map(user => <option key={user._id}
-                                                                           value={user._id}>{user.firstName} {user.lastName}</option>)}
-                                </select>
-                                <input type="text" value={newTask.subject}
-                                       onChange={e => setNewTask(prevTask => ({...prevTask, subject: e.target.value}))}
-                                       placeholder="Subject" required
-                                />
-                                <input type="date" value={newTask.dueBy}
-                                       onChange={e => setNewTask(prevTask => ({...prevTask, dueBy: e.target.value}))}
-                                       placeholder="Due By" required
-                                />
-                                <textarea value={newTask.description} onChange={e => setNewTask(prevTask => ({
-                                    ...prevTask,
-                                    description: e.target.value
-                                }))} placeholder="Description" required
-                                />
-                                <select value={newTask.assignedTo}
-                                        onChange={e => setNewTask(prevTask => ({...prevTask, assignedTo: e.target.value}))}
-                                        required>
-                                    {users.map(user => <option key={user._id}
-                                                               value={user._id}>{user.firstName} {user.lastName}</option>)}
-                                </select>
-                                <button type="submit" >Create Task</button>
-                            </form>
+                            <>
+                            {showForm && (
+                                    <form onSubmit={handleNewTaskSubmit} className="task-form">
+                                        <select value={newTask.manager}
+                                                onChange={e => setNewTask(prevTask => ({...prevTask, manager: e.target.value}))}
+                                                required>
+                                            {managersAndAdmins.map(user => <option key={user._id}
+                                                                                   value={user._id}>{user.firstName} {user.lastName}</option>)}
+                                        </select>
+                                        <input type="text" value={newTask.subject}
+                                               onChange={e => setNewTask(prevTask => ({...prevTask, subject: e.target.value}))}
+                                               placeholder="Subject" required
+                                        />
+                                        <input type="date" value={newTask.dueBy}
+                                               onChange={e => setNewTask(prevTask => ({...prevTask, dueBy: e.target.value}))}
+                                               placeholder="Due By" required
+                                        />
+                                        <textarea value={newTask.description} onChange={e => setNewTask(prevTask => ({
+                                            ...prevTask,
+                                            description: e.target.value
+                                        }))} placeholder="Description" required
+                                        />
+                                        <select value={newTask.assignedTo}
+                                                onChange={e => setNewTask(prevTask => ({...prevTask, assignedTo: e.target.value}))}
+                                                required>
+                                            {users.map(user => <option key={user._id}
+                                                                       value={user._id}>{user.firstName} {user.lastName}</option>)}
+                                        </select>
+                                        <button type="submit" >Create Task</button>
+                                    </form>
+                                )}
+                                <FontAwesomeIcon icon={showForm ? faMinus : faPlus} className={`plus-icon ${showForm ? 'minus-icon' : ''}`} onClick={() => setShowForm(!showForm)} />
+                            </>
                         )}
                     </div>
                 ))}
