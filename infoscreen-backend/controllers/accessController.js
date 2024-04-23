@@ -31,3 +31,27 @@ exports.getRoleByUserId = async (userId) => {
         throw err;
     }
 };
+
+exports.createRole = async (req, res) => {
+    try {
+        const db = getDb();
+        const { userId, role } = req.body;
+
+        // Validate the inputs
+        if (!userId || !role) {
+            return res.status(400).send({ error: "userId and role are required." });
+        }
+
+        // Create the new role document
+        const result = await db.collection('roles').insertOne({ userId, role });
+
+        if (result.insertedCount !== 1) {
+            throw new Error('Failed to create role.');
+        }
+
+        res.send({ success: true, message: 'Role created successfully.' });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ error: "Unable to create role." });
+    }
+};

@@ -22,10 +22,10 @@ const CommentBox: React.FC<CommentBoxProps> = ({ task, setTask }) => {
             console.log('Response:', response);
             if (response.success) {
                 // Update the task state with the new comment
-               // localTask.comments.push(response.comment);
-                console.log(localTask.comments)
-                console.log(response.comment)
-                setTask((prevTask: Task) => ({...prevTask, comments: [...prevTask.comments, response.comment]}));
+                setTask((prevTask: Task) => ({
+                    ...prevTask,
+                    comments: [...(prevTask.comments || []), response.comment]
+                }));
             }
         } catch (error) {
             console.error('Failed to add comment:', error);
