@@ -9,9 +9,10 @@ interface CommentProps {
     key: string;
     comment: Comment;
     task: Task;
+    setTask: Dispatch<SetStateAction<Task>>;
 }
 
-const CommentEntry: React.FC<CommentProps> = ({comment, task }) => {
+const CommentEntry: React.FC<CommentProps> = ({comment, task, setTask }) => {
     const [localTask, setLocalTask] = useState<Task>(task);
     const [isEditing, setIsEditing] = useState(false);
     const [editedText, setEditedText] = useState(comment.text);
@@ -37,6 +38,7 @@ const CommentEntry: React.FC<CommentProps> = ({comment, task }) => {
                     updatedTask.comments[commentIndex].text = newText;
                     task.comments[commentIndex].text = newText;
                     setLocalTask(updatedTask);
+                    setTask(updatedTask);
                 }
             }
         } catch (error) {
@@ -52,7 +54,7 @@ const CommentEntry: React.FC<CommentProps> = ({comment, task }) => {
                 const updatedTask = { ...task, comments: task.comments.filter(comment => comment.id !== commentId) };
                 task.comments = task.comments.filter(comment => comment.id !== commentId);
                 setLocalTask(updatedTask)
-                //setTask(updatedTask);
+                setTask(updatedTask);
             }
         } catch (error) {
             console.error('Failed to delete comment:', error);
@@ -64,12 +66,12 @@ const CommentEntry: React.FC<CommentProps> = ({comment, task }) => {
     };
 
     const handleSave = () => {
-        handleEditComment(localTask, comment.id, editedText);
+        handleEditComment(task, comment.id, editedText);
         setIsEditing(false);
     };
 
     const handleDelete = () => {
-        handleDeleteComment(localTask, comment.id);
+        handleDeleteComment(task, comment.id);
     };
 
     return (

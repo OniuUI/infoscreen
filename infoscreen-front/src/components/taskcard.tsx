@@ -50,9 +50,9 @@ const Card: React.FC<CardProps> = ({users, task, manager, subject, dueBy, handle
 
     const handleDescriptionBlur = async () => {
         // Make an API call to update the task
-        const updatedTask = { ...task, description: editedDescription };
+        const updatedTask = { ...localTask, description: editedDescription };
         try {
-            await apiService.put(`/kaizen/updateTask/${task.id}?userIdent=${userIdent}`, updatedTask);
+            await apiService.put(`/kaizen/updateTask/${localTask.id}?userIdent=${userIdent}`, updatedTask);
             setLocalTask(updatedTask)
             //setTask(updatedTask);
         } catch (error) {
@@ -66,9 +66,9 @@ const Card: React.FC<CardProps> = ({users, task, manager, subject, dueBy, handle
 
     const handleDueByBlur = async () => {
         // Make an API call to update the task
-        const updatedTask = { ...task, dueBy: editedDueBy };
+        const updatedTask = { ...localTask, dueBy: editedDueBy };
         try {
-            await apiService.put(`/kaizen/updateTask/${task.id}?userIdent=${userIdent}`, updatedTask);
+            await apiService.put(`/kaizen/updateTask/${localTask.id}?userIdent=${userIdent}`, updatedTask);
             //setTask(updatedTask);
         } catch (error) {
             console.error('Failed to update task:', error);
@@ -76,20 +76,20 @@ const Card: React.FC<CardProps> = ({users, task, manager, subject, dueBy, handle
     };
 
     const handleDelete = () => {
-        handleDeleteTask(task.id);
+        handleDeleteTask(localTask.id);
     };
 
     const handleUserChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedUser(event.target.value);
 
         // Update the task in the backend
-        const updatedTask = { ...task, assignedTo: { _id: event.target.value } };
+        const updatedTask = { ...localTask, assignedTo: { _id: event.target.value } };
         try {
-            const response = await apiService.put(`/kaizen/updateTask/${task.id}`, updatedTask);
+            const response = await apiService.put(`/kaizen/updateTask/${localTask.id}`, updatedTask);
             console.log('Response:', response);
             if (response.success) {
                 // Update the task in the frontend
-                task.assignedTo._id = event.target.value;
+                localTask.assignedTo._id = event.target.value;
             }
         } catch (error) {
             console.error('Failed to update task:', error);
@@ -101,12 +101,12 @@ const Card: React.FC<CardProps> = ({users, task, manager, subject, dueBy, handle
     const handleAddComment = async (commentText: string) => {
         try {
             const comment = { id: uuidv4(), text: commentText, author: 'User' }; // Replace 'User' with the actual user
-            const response = await apiService.post(`/kaizen/addComment/${task.id}`, comment);
+            const response = await apiService.post(`/kaizen/addComment/${localTask.id}`, comment);
             console.log('Response:', response);
             if (response.success) {
                 // Update the task state with the new comment
-                task.comments.push(response.comment);
-                console.log(task.comments)
+                localTask.comments.push(response.comment);
+                console.log(localTask.comments)
                 console.log(response.comment)
                 //setTask((prevTask: Task) => ({...prevTask, comments: [...prevTask.comments, response.comment]}));
             }
@@ -119,13 +119,13 @@ const Card: React.FC<CardProps> = ({users, task, manager, subject, dueBy, handle
         <div className="card">
             <div className="card__header">
                 <input type="text" value={editedSubject} onChange={handleSubjectChange} onBlur={handleSubjectBlur}
-                       readOnly={userRole !== 'admin' && userIdent !== task.manager._id}/>
+                       readOnly={userRole !== 'admin' && userIdent !== localTask.manager._id}/>
             </div>
             <div className="card__body">
                 Description:
                 <textarea value={editedDescription} onChange={handleDescriptionChange} onBlur={handleDescriptionBlur}
-                          readOnly={userRole !== 'admin' && userIdent !== task.manager._id}/>
-                <p>Manager: {task.manager ? `${task.manager.firstName} ${task.manager.lastName}` : 'Unassigned'}</p>
+                          readOnly={userRole !== 'admin' && userIdent !== localTask.manager._id}/>
+                <p>Manager: {localTask.manager ? `${localTask.manager.firstName} ${localTask.manager.lastName}` : 'Unassigned'}</p>
                 <label>
                     Assigned to:
                     <select value={selectedUser} onChange={handleUserChange}>
@@ -140,11 +140,12 @@ const Card: React.FC<CardProps> = ({users, task, manager, subject, dueBy, handle
                 <label>
                     Due by:
                     <input type="date" value={editedDueBy} onChange={handleDueByChange} onBlur={handleDueByBlur}
-                           readOnly={userRole !== 'admin' && userIdent !== task.manager._id}/>
+                           readOnly={userRole !== 'admin' && userIdent !== localTask.manager._id}/>
                 </label>
                 <CommentBox handleAddComment={handleAddComment} />
-                {task.comments && task.comments.map((comment: Comment) => (
+                {localTask.comments && localTask.comments.map((comment: Comment) => (
                     <CommentEntry
+                        setTask={setLocalTask}
                         key={comment.id}
                         comment={comment}
                         task={task}
@@ -152,7 +153,7 @@ const Card: React.FC<CardProps> = ({users, task, manager, subject, dueBy, handle
                 ))}
             </div>
             <div className="card__footer">
-                {((task.manager._id === manager._id) || (localStorage.getItem("role") === 'Admin')) && (
+                {((localTask.manager._id === manager._id) || (localStorage.getItem("role") === 'Admin')) && (
                     <button className="delete-button" onClick={handleDelete}>Delete</button>
                 )}
             </div>
