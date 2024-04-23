@@ -274,7 +274,10 @@ const Kaizen: React.FC = () => {
         }
 
         // Find the task
-        const task = sourceColumn.tasks.find((task: Task) => task.id === draggableId);
+        //const task = sourceColumn.tasks.find((task: Task) => task.id === draggableId);
+        console.log(draggableId)
+        const response = await apiService.get(`/kaizen/tasks/${draggableId}`);
+        const task = response.task;
 
         if (!task) {
             return;
