@@ -65,3 +65,17 @@
 .complete-task-button {
     background-color: lightgreen;
 }
+
+.plus-icon {
+    margin-top: 5%;
+    font-size: 2em; /* Adjust as needed */
+    color: white;
+    background-color: #ccc; /* Light gray */
+    border-radius: 50%; /* Makes the background a circle */
+    padding: 0.5em; /* Adjust as needed */
+}
+
+.minus-icon {
+
+    background: firebrick;
+}
