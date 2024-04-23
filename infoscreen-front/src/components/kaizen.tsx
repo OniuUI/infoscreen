@@ -4,25 +4,8 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import Card from './taskcard';
 import {apiService} from "./api/apiservice";
 import { v4 as uuidv4 } from 'uuid';
-import { Comment } from './utils/types';
+import {User, Task, Comment } from './utils/types';
 import './css/kaizen.css'
-
-interface User {
-    id: string;
-    name: string;
-}
-
-interface Task {
-    _id: { $oid: string };
-    id: string;
-    manager: User;
-    subject: string;
-    dueBy: string;
-    description: string;
-    assignedTo: User;
-    status: string;
-    comments: Comment[];
-}
 
 interface TaskProps {
     title: string;
@@ -43,18 +26,6 @@ interface completeProps {
     users: User[];
 }
 
-interface User {
-    _id: string;
-    firstName: string;
-    lastName: string;
-    birthdate: string;
-    imageUrl: string;
-    coffee: number;
-    soda: number;
-    email?: string;
-    password?: string;
-    refreshToken?: string;
-}
 
 const Kaizen: React.FC = () => {
     const [newTask, setNewTask] = useState({ manager: '', subject: '', dueBy: '', description: '', assignedTo: '' });
@@ -224,7 +195,7 @@ const Kaizen: React.FC = () => {
 
             // Update the task in the backend
             try {
-                await apiService.put(`/kaizen/updateTask/${task.id}`, updatedTask);
+                await apiService.put(`/kaizen/updateTask/${task.id}?userIdent=${userIdent}&role=${userRole}`, updatedTask);
             } catch (error) {
                 console.error('Failed to update task:', error);
                 return;
@@ -320,7 +291,8 @@ const Kaizen: React.FC = () => {
 
         // Update the task in the backend
         try {
-            await apiService.put(`/kaizen/updateTask/${draggableId}`, task);
+            console.log('Checking ident:', userIdent);
+            await apiService.put(`/kaizen/updateTask/${draggableId}?userIdent=${userIdent}&role=${userRole}`, task);
         } catch (error) {
             console.error('Failed to update task:', error);
         }

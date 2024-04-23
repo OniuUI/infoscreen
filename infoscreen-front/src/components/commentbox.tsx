@@ -1,16 +1,10 @@
 import React, {useState, useRef, SetStateAction, Dispatch} from 'react';
-import {Task, Comment} from './utils/types';
-
-
 
 interface CommentBoxProps {
-    task: Task;
     handleAddComment: (commentText: string) => Promise<void>;
-    comments: Comment[]; // Add this line
-    setComments: Dispatch<SetStateAction<Comment[]>>; // Add this line
 }
 
-const CommentBox: React.FC<CommentBoxProps> = ({ task, handleAddComment, comments, setComments }) => {
+const CommentBox: React.FC<CommentBoxProps> = ({ handleAddComment }) => {
     const [comment, setComment] = useState('');
     const [isCommentFieldFocused, setIsCommentFieldFocused] = useState(false);
     const timer = useRef<NodeJS.Timeout | null>(null);

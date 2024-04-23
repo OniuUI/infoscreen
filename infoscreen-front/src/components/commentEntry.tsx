@@ -1,0 +1,111 @@
+import React, {Dispatch, SetStateAction, useState} from "react";
+import {Task, Comment} from "./utils/types";
+import {apiService} from "./api/apiservice";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faChevronDown, faChevronUp} from "@fortawesome/free-solid-svg-icons";
+
+
+interface CommentProps {
+    key: string;
+    comment: Comment;
+    task: Task;
+}
+
+const CommentEntry: React.FC<CommentProps> = ({comment, task }) => {
+    const [localTask, setLocalTask] = useState<Task>(task);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedText, setEditedText] = useState(comment.text);
+
+    // Add a new state variable for the dropdown menu visibility
+    const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
+    // Function to toggle the dropdown menu visibility
+    const toggleDropdown = () => {
+        setIsDropdownVisible(!isDropdownVisible);
+    };
+
+
+    const handleEditComment = async (task: Task, commentId: string, newText: string) => {
+        try {
+            const comment = { text: newText };
+            const response = await apiService.put(`/kaizen/editComment/${task.id}/${commentId}`, comment);
+            if (response.success) {
+                // Update the comment in the task in the frontend
+                const commentIndex = task.comments.findIndex(comment => comment.id === commentId);
+                if (commentIndex !== -1) {
+                    const updatedTask = { ...task };
+                    updatedTask.comments[commentIndex].text = newText;
+                    task.comments[commentIndex].text = newText;
+                    setLocalTask(updatedTask);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to edit comment:', error);
+        }
+    };
+
+    const handleDeleteComment = async (task: Task, commentId: string) => {
+        try {
+            const response = await apiService.delete(`/kaizen/deleteComment/${task.id}/${commentId}`);
+            if (response.success) {
+                // Update the task in the frontend
+                const updatedTask = { ...task, comments: task.comments.filter(comment => comment.id !== commentId) };
+                task.comments = task.comments.filter(comment => comment.id !== commentId);
+                setLocalTask(updatedTask)
+                //setTask(updatedTask);
+            }
+        } catch (error) {
+            console.error('Failed to delete comment:', error);
+        }
+    };
+
+    const handleEdit = () => {
+        setIsEditing(true);
+    };
+
+    const handleSave = () => {
+        handleEditComment(localTask, comment.id, editedText);
+        setIsEditing(false);
+    };
+
+    const handleDelete = () => {
+        handleDeleteComment(localTask, comment.id);
+    };
+
+    return (
+        <div className="comment">
+            <div className="comment__content">
+                {isEditing ? (
+                    <div>
+                        <input type="text" value={editedText} onChange={e => setEditedText(e.target.value)}/>
+                        <button onClick={handleSave}>Save</button>
+                    </div>
+                ) : (
+                    <p className="comment__text"><span
+                        className="comment__author">{comment.author}</span> - {comment.text}
+                    </p>
+                )}
+            </div>
+            <div className="comment__actions">
+                <FontAwesomeIcon icon={isDropdownVisible ? faChevronUp : faChevronDown} onClick={toggleDropdown}/>
+                {isDropdownVisible && (  // Dropdown menu
+                    <div className="dropdown-menu">
+                        <div className="dropdown-item" onClick={() => {
+                            handleEdit();
+                            toggleDropdown();
+                        }}>Edit
+                        </div>
+                        <div className="dropdown-item" onClick={() => {
+                            handleDelete();
+                            toggleDropdown();
+                        }}>Delete
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+
+export default CommentEntry;

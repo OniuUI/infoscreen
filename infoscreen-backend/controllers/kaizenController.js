@@ -29,20 +29,25 @@ exports.createNewTask =  async (req, res) => {
 
 // Route to update a task
 exports.updateTask = async (req, res) => {
+    console.log('updateTask called'); // Log when the function is called
     try {
         const db = getDb();
         const taskId = req.params.id;
         let updatedTask = req.body;
 
+        console.log(`Updating task with ID: ${taskId}`); // Log the ID of the task being updated
+
         // Extract userIdent and role from the request
         const userIdent = req.query.userIdent;
         const role = req.query.role;
 
+        console.log(`userIdent: ${userIdent}, role: ${role}`); // Log the userIdent and role
         // Get the task from the database
         const task = await db.collection('tasks').findOne({ id: taskId });
 
         // Check if the user has the right permissions
-        if (role !== 'admin' && userIdent !== task.manager._id) {
+        if (!(role === 'admin' || userIdent === task.manager._id)) {
+            console.log('Permission denied'); // Log when the user does not have the right permissions
             return res.status(403).send({ error: 'You do not have the right permissions to update this task.' });
         }
 
@@ -55,12 +60,13 @@ exports.updateTask = async (req, res) => {
             { upsert: false } // options
         );
         if (result.matchedCount === 0) {
+            console.log('Task not found'); // Log when the task is not found
             return res.status(404).send({ error: 'Task not found.' });
         }
-        console.log(`Task updated with ID: ${taskId}`);
+        console.log(`Task updated with ID: ${taskId}`); // Log when the task is successfully updated
         res.send({ success: true });
     } catch (err) {
-        console.log(err)
+        console.log('Error updating task:', err); // Log any errors that occur
         res.status(500).send({ error: "Unable to update task."  });
     }
 };
