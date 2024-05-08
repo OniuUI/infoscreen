@@ -36,6 +36,7 @@ const Kaizen: React.FC = () => {
     const [userRole, setUserRole] = useState('');
     const [userIdent, setUserIdent] = useState('');
     const [showForm, setShowForm] = useState(false);
+    const [assignToUser, setAssignToUser] = useState(false);
 
     useEffect(() => {
         // Retrieve userIdent from local storage
@@ -132,9 +133,9 @@ const Kaizen: React.FC = () => {
         return; // () => clearInterval(intervalId); // Cleanup interval on unmount
     }, []);
 
+
     const handleNewTaskSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-
 
         try {
             const managerUser = managersAndAdmins.find(user => user._id === newTask.manager);
@@ -142,12 +143,16 @@ const Kaizen: React.FC = () => {
                 console.error('User not found:', newTask.manager);
                 return;
             }
-            const assignedUser = users.find(user => user._id === newTask.assignedTo);
-            if (!assignedUser) {
-                console.error('User not found:', newTask.assignedTo);
-                return;
+            let assignedUser = 'Unassigned';
+            if (assignToUser) {
+                const foundUser = users.find(user => user._id === newTask.assignedTo);
+                if (!foundUser) {
+                    console.error('User not found:', newTask.assignedTo);
+                    return;
+                }
+                assignedUser = foundUser._id;
             }
-            const task = { ...newTask, manager: managerUser, assignedTo: assignedUser, id: uuidv4(), status: 'New' };
+            const task = { ...newTask, manager: managerUser._id, assignedTo: assignedUser, id: uuidv4(), status: 'New' };
             const response = await apiService.post('/kaizen/createTask', task);
             console.log('Response:', response);
             if (response.success) {
@@ -166,6 +171,7 @@ const Kaizen: React.FC = () => {
             console.error('Failed to create new task:', error);
         }
     };
+
     const handleStatusChange = async (task: Task, event: React.ChangeEvent<HTMLSelectElement>) => {
         try {
             await apiService.put(`/kaizen/updateTask/${task.id}`, { ...task, status: event.target.value });
@@ -355,36 +361,58 @@ const Kaizen: React.FC = () => {
                         {column.title === 'New' && (userRole === 'admin' || userRole === 'manager') && (
                             <>
                             {showForm && (
-                                    <form onSubmit={handleNewTaskSubmit} className="task-form">
-                                        <select value={newTask.manager}
-                                                onChange={e => setNewTask(prevTask => ({...prevTask, manager: e.target.value}))}
-                                                required>
-                                            {managersAndAdmins.map(user => <option key={user._id}
-                                                                                   value={user._id}>{user.firstName} {user.lastName}</option>)}
-                                        </select>
-                                        <input type="text" value={newTask.subject}
-                                               onChange={e => setNewTask(prevTask => ({...prevTask, subject: e.target.value}))}
-                                               placeholder="Subject" required
-                                        />
-                                        <input type="date" value={newTask.dueBy}
-                                               onChange={e => setNewTask(prevTask => ({...prevTask, dueBy: e.target.value}))}
-                                               placeholder="Due By" required
-                                        />
-                                        <textarea value={newTask.description} onChange={e => setNewTask(prevTask => ({
-                                            ...prevTask,
-                                            description: e.target.value
-                                        }))} placeholder="Description" required
-                                        />
+                                <form onSubmit={handleNewTaskSubmit} className="task-form">
+                                    <select value={newTask.manager}
+                                            onChange={e => setNewTask(prevTask => ({
+                                                ...prevTask,
+                                                manager: e.target.value
+                                            }))}
+                                            required>
+                                        {managersAndAdmins.map(user => <option key={user._id}
+                                                                               value={user._id}>{user.firstName} {user.lastName}</option>)}
+                                    </select>
+                                    <input type="text" value={newTask.subject}
+                                           onChange={e => setNewTask(prevTask => ({
+                                               ...prevTask,
+                                               subject: e.target.value
+                                           }))}
+                                           placeholder="Subject" required
+                                    />
+                                    <input type="date" value={newTask.dueBy}
+                                           onChange={e => setNewTask(prevTask => ({
+                                               ...prevTask,
+                                               dueBy: e.target.value
+                                           }))}
+                                           placeholder="Due By" required
+                                    />
+                                    <textarea value={newTask.description} onChange={e => setNewTask(prevTask => ({
+                                        ...prevTask,
+                                        description: e.target.value
+                                    }))} placeholder="Description" required
+                                    />
+                                    <div className="checkbox-container">
+                                        <label className="assign-label">Assign to user</label>
+                                        <input type="checkbox" checked={assignToUser}
+                                               onChange={e => setAssignToUser(e.target.checked)}
+                                               className="assign-checkbox"/>
+                                    </div>
+                                    {assignToUser && (
                                         <select value={newTask.assignedTo}
-                                                onChange={e => setNewTask(prevTask => ({...prevTask, assignedTo: e.target.value}))}
+                                                onChange={e => setNewTask(prevTask => ({
+                                                    ...prevTask,
+                                                    assignedTo: e.target.value
+                                                }))}
                                                 required>
                                             {users.map(user => <option key={user._id}
                                                                        value={user._id}>{user.firstName} {user.lastName}</option>)}
                                         </select>
-                                        <button type="submit" >Create Task</button>
-                                    </form>
-                                )}
-                                <FontAwesomeIcon icon={showForm ? faMinus : faPlus} className={`plus-icon ${showForm ? 'minus-icon' : ''}`} onClick={() => setShowForm(!showForm)} />
+                                    )}
+                                    <button type="submit">Create Task</button>
+                                </form>
+                            )}
+                                <FontAwesomeIcon icon={showForm ? faMinus : faPlus}
+                                                 className={`plus-icon ${showForm ? 'minus-icon' : ''}`}
+                                                 onClick={() => setShowForm(!showForm)} />
                             </>
                         )}
                     </div>
