@@ -1,5 +1,6 @@
 const accessController = require('./accessController');
 const {getDb} = require("../db");
+const mailService = require("../mailservice/mailService");
 
 /**
  * @swagger
@@ -61,9 +62,18 @@ exports.createNewTask =  async (req, res) => {
         const db = getDb();
         const task = req.body;
         const result = await db.collection('tasks').insertOne(task);
+
+        // After task is successfully created:
+        const userEmail = task.assignedTo.email; // TODO: make a function to get the email for the user from the database.
+        const subject = 'New Task Assigned';
+        const html = `<p>A new task titled "${task.subject}" has been assigned to you by ${task.manager.firstName} ${task.manager.lastName}. Please check the Kaizen board for details. <a href="${process.env.WEBSITE_URL}/kaizen">Click here to view the task.</a></p>`;
+
+        await mailService.sendEmail(userEmail, subject, html);
+
         res.send({ success: true, task: { ...task, _id: result.insertedId } });
     } catch (err) {
-        res.status(500).send({ error: "Unable to create task." });
+        console.log(err);
+        res.status(500).send({ error: "Unable to create task. ", err });
     }
 };
 
