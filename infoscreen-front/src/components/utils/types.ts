@@ -33,3 +33,10 @@ export interface Column {
     title: string;
     tasks: Task[];
 }
+
+export interface Role {
+    _id: string;
+    name: string;
+    description?: string; // Optional description property
+    settings?: any; // Replace 'any' with the actual type of your settings
+}

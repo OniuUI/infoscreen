@@ -32,23 +32,89 @@ exports.getRoleByUserId = async (userId) => {
 exports.createRole = async (req, res) => {
     try {
         const db = getDb();
-        const { userId, role } = req.body;
+        let { userId, role } = req.body;
+
+        // Convert userId to string
+        userId = String(userId);
 
         // Validate the inputs
         if (!userId || !role) {
             return res.status(400).send({ error: "userId and role are required." });
         }
 
-        // Create the new role document
-        const result = await db.collection('roles').insertOne({ userId, role });
+        // Update the role document or insert a new one if it doesn't exist
+        await db.collection('roles').updateOne({ userId }, { $set: { role } }, { upsert: true });
 
-        if (result.insertedCount !== 1) {
-            throw new Error('Failed to create role.');
-        }
-
-        res.send({ success: true, message: 'Role created successfully.' });
+        res.send({ success: true, message: 'Role created or updated successfully.' });
     } catch (err) {
         console.log(err);
-        res.status(500).send({ error: "Unable to create role." });
+        res.status(500).send({ error: "Unable to create or update role." });
     }
 };
+
+exports.updateRole = async (req, res) => {
+    try {
+        const db = getDb();
+        let { userId, role } = req.body;
+
+        // Convert userId to string
+        userId = String(userId);
+
+        // Validate the inputs
+        if (!userId || !role) {
+            return res.status(400).send({ error: "userId and role are required." });
+        }
+
+        // Update the role document or insert a new one if it doesn't exist
+        await db.collection('roles').updateOne({ userId }, { $set: { role } }, { upsert: false });
+
+        res.send({ success: true, message: 'Role updated successfully.' });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ error: "Unable to update role." });
+    }
+};
+
+exports.deleteRole = async (req, res) => {
+    try {
+        const db = getDb();
+        const { userId } = req.params;
+
+        // Validate the inputs
+        if (!userId) {
+            return res.status(400).send({ error: "userId is required." });
+        }
+
+        // Delete the role document
+        await db.collection('roles').deleteOne({ userId });
+
+        res.send({ success: true, message: 'Role deleted successfully.' });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ error: "Unable to delete role." });
+    }
+};
+
+/**
+ * @openapi
+ * /api/roles:
+ *   get:
+ *      tags:
+ *        - Role
+ *   description: Returns a list of all roles
+ *   responses:
+ *     200:
+ *       description: A list of roles.
+ *     500:
+ *       description: Unable to read role data.
+ */
+exports.getAllRoles = async (req, res) => {
+    try {
+        const db = getDb();
+        const roles = await db.collection('systemroles').find().toArray();
+        res.send({ roles: roles });
+    } catch (err) {
+        res.status(500).send({ error: "Unable to read system role data."});
+    }
+};
+
