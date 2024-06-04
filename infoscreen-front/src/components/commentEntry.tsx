@@ -28,7 +28,11 @@ const CommentEntry: React.FC<CommentProps> = ({comment, task, setTask }) => {
 
     const handleEditComment = async (task: Task, commentId: string, newText: string) => {
         try {
-            const comment = { text: newText };
+            const comment = {
+                text: newText,
+                edited: true, // Set edited to true
+                lastEdited: new Date().toISOString() // Set lastEdited to the current date and time
+            };
             const response = await apiService.put(`/kaizen/editComment/${task.id}/${commentId}`, comment);
             if (response.success) {
                 // Update the comment in the task in the frontend
@@ -36,7 +40,11 @@ const CommentEntry: React.FC<CommentProps> = ({comment, task, setTask }) => {
                 if (commentIndex !== -1) {
                     const updatedTask = { ...task };
                     updatedTask.comments[commentIndex].text = newText;
+                    updatedTask.comments[commentIndex].edited = true; // Update edited
+                    updatedTask.comments[commentIndex].lastEdited = new Date().toISOString(); // Update lastEdited
                     task.comments[commentIndex].text = newText;
+                    task.comments[commentIndex].edited = true; // Update edited
+                    task.comments[commentIndex].lastEdited = new Date().toISOString(); // Update lastEdited
                     setLocalTask(updatedTask);
                     setTask(updatedTask);
                 }
@@ -55,6 +63,9 @@ const CommentEntry: React.FC<CommentProps> = ({comment, task, setTask }) => {
                 task.comments = task.comments.filter(comment => comment.id !== commentId);
                 setLocalTask(updatedTask)
                 setTask(updatedTask);
+            }
+            else {
+                console.error('Failed to delete comment:', response.error);
             }
         } catch (error) {
             console.error('Failed to delete comment:', error);
@@ -83,8 +94,11 @@ const CommentEntry: React.FC<CommentProps> = ({comment, task, setTask }) => {
                         <button onClick={handleSave}>Save</button>
                     </div>
                 ) : (
-                    <p className="comment__text"><span
-                        className="comment__author">{comment.author}</span> - {comment.text}
+                    <p className="comment__text">
+                        <span
+                            className="comment__author">{comment.author.firstName} {comment.author.lastName}</span> - {comment.text} - <br/> <span className="timestamp">  {comment.created}</span>
+                        {comment.edited &&
+                            <span className="comment__edited">Edited</span>} {/* Display "Edited" label */}
                     </p>
                 )}
             </div>
@@ -105,6 +119,7 @@ const CommentEntry: React.FC<CommentProps> = ({comment, task, setTask }) => {
                     </div>
                 )}
             </div>
+            {comment.edited && <div className="comment__edited-date">Last edited: {comment.lastEdited}</div>} {/* Display last edited date */}
         </div>
     );
 };

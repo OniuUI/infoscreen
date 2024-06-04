@@ -143,16 +143,16 @@ const Kaizen: React.FC = () => {
                 console.error('User not found:', newTask.manager);
                 return;
             }
-            let assignedUser = 'Unassigned';
+            let assignedUser = null;
             if (assignToUser) {
                 const foundUser = users.find(user => user._id === newTask.assignedTo);
                 if (!foundUser) {
                     console.error('User not found:', newTask.assignedTo);
                     return;
                 }
-                assignedUser = foundUser._id;
+                assignedUser = foundUser; // Set assignedUser to the user object instead of the ID
             }
-            const task = { ...newTask, manager: managerUser._id, assignedTo: assignedUser, id: uuidv4(), status: 'New' };
+            const task = { ...newTask, manager: managerUser, assignedTo: assignedUser, id: uuidv4(), status: 'New' }; // Set manager to the user object instead of the ID
             const response = await apiService.post('/kaizen/createTask', task);
             console.log('Response:', response);
             if (response.success) {

@@ -111,9 +111,10 @@ exports.addUser = async (req, res) => {
 
 exports.getUserById = async (id) => {
     try {
+        console.log('id', id)
         const db = getDb();
         const user = await db.collection('users').findOne({ _id: id });
-
+        console.log('user', user)
         if (!user) {
             throw new Error('User not found.');
         }

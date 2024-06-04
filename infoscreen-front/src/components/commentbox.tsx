@@ -1,7 +1,7 @@
 import React, {useState, useRef, SetStateAction, Dispatch} from 'react';
 import {v4 as uuidv4} from "uuid";
 import {apiService} from "./api/apiservice";
-import {Task} from "./utils/types";
+import {Task, User} from "./utils/types";
 
 interface CommentBoxProps {
     task: Task;
@@ -14,10 +14,36 @@ const CommentBox: React.FC<CommentBoxProps> = ({ task, setTask }) => {
     const [comment, setComment] = useState('');
     const [isCommentFieldFocused, setIsCommentFieldFocused] = useState(false);
     const timer = useRef<NodeJS.Timeout | null>(null);
+    const [LoggedInUser, setLoggedInUser] = useState<User | null>()
+
+    var fetchUser = async () => {
+        try {
+            var userIdent = localStorage.getItem('userIdent')
+            console.log('User Ident:', userIdent);
+            const response = await apiService.get('/users/' + userIdent);
+
+                console.log('User:', response.user);
+                setLoggedInUser(response.user);
+                return response.user;
+
+            console.log('Loggedinuser:', LoggedInUser);
+
+        } catch (error) {
+            console.error('Failed to fetch user:', error);
+        }
+    }
 
     const handleAddComment = async (commentText: string) => {
         try {
-            const comment = { id: uuidv4(), text: commentText, author: 'User' }; // Replace 'User' with the actual user
+            const user = await fetchUser();
+            const userId = user?._id;
+            const minifiedUser = { firstName: user?.firstName, lastName: user?.lastName, id: userId };
+            const comment = {
+                id: uuidv4(),
+                text: commentText,
+                author: minifiedUser, // Store the minified user object in the comment
+                created: new Date().toISOString() // Add a timestamp to the comment
+            };
             const response = await apiService.post(`/kaizen/addComment/${localTask.id}`, comment);
             console.log('Response:', response);
             if (response.success) {

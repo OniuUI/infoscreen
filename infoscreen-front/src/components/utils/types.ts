@@ -1,9 +1,11 @@
 export interface Comment {
     id: string;
     text: string;
-    author: string;
+    author: CommentUser;
+    created: string;
+    edited: boolean; // Add this line
+    lastEdited: string; // Add this line
 }
-
 export interface Task {
     _id: { $oid: string };
     id: string;
@@ -27,6 +29,13 @@ export interface User {
     email?: string;
     password?: string;
     refreshToken?: string;
+}
+
+export interface CommentUser {
+    firstName: string;
+    lastName: string;
+    id: string;
+
 }
 
 export interface Column {

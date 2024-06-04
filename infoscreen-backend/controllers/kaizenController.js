@@ -1,6 +1,9 @@
 const accessController = require('./accessController');
 const {getDb} = require("../db");
 const mailService = require("../mailservice/mailService");
+const DataBroker = require("../utils/databroker");
+
+const dataBroker = new DataBroker();
 
 /**
  * @swagger
@@ -63,12 +66,17 @@ exports.createNewTask =  async (req, res) => {
         const task = req.body;
         const result = await db.collection('tasks').insertOne(task);
 
+
         // After task is successfully created:
-        const userEmail = task.assignedTo.email; // TODO: make a function to get the email for the user from the database.
+        //const selectedUser = await dataBroker.getUsers({ _id: task.assignedTo });
+        //const assignedTo = task.assignedTo;
+        //console.log(selectedUser[0]);
+        //console.log(selectedUser[0].email);
+        //const userEmail = selectedUser[0].email; // TODO: make a function to get the email for the user from the database.
         const subject = 'New Task Assigned';
         const html = `<p>A new task titled "${task.subject}" has been assigned to you by ${task.manager.firstName} ${task.manager.lastName}. Please check the Kaizen board for details. <a href="${process.env.WEBSITE_URL}/kaizen">Click here to view the task.</a></p>`;
 
-        await mailService.sendEmail(userEmail, subject, html);
+        await mailService.sendEmail(task.assignedTo.email, subject, html);
 
         res.send({ success: true, task: { ...task, _id: result.insertedId } });
     } catch (err) {
@@ -152,10 +160,17 @@ exports.editComment = async (req, res) => {
         const taskId = req.params.taskId;
         const commentId = req.params.commentId;
         const updatedComment = req.body;
+        console.log(updatedComment);
 
         const result = await db.collection('tasks').updateOne(
             { id: taskId, "comments.id": commentId }, // filter
-            { $set: { "comments.$.text": updatedComment.text } } // update
+            {
+                $set: {
+                    "comments.$.text": updatedComment.text,
+                    "comments.$.edited": updatedComment.edited, // Set edited to true
+                    "comments.$.lastEdited": updatedComment.lastEdited // Set lastEdited to the current date and time
+                }
+            } // update
         );
 
         if (result.matchedCount === 0) {
@@ -167,6 +182,7 @@ exports.editComment = async (req, res) => {
         res.status(500).send({ error: "Unable to update comment." });
     }
 };
+
 
 /**
  * @swagger

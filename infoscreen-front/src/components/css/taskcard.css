@@ -66,6 +66,16 @@
     color: var(--raw-umber);
 }
 
+.timestamp {
+    color: yellow;
+    font-size: 12px;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100px;
+}
+
 input[type="text"], input[type="date"], select {
     width: 100%;
     padding: 12px 20px;
