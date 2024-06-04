@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 
 exports.sendEmail = async (to, subject, html) => {
     // If the mail service is disabled, do nothing
-    if (process.env.MAIL_SERVICE_ENABLED !== 'false') {
+    if (process.env.MAIL_SERVICE_ENABLED !== 'true') {
         console.log('Mail service is disabled.');
         return;
     }

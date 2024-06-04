@@ -67,12 +67,6 @@ exports.createNewTask =  async (req, res) => {
         const result = await db.collection('tasks').insertOne(task);
 
 
-        // After task is successfully created:
-        //const selectedUser = await dataBroker.getUsers({ _id: task.assignedTo });
-        //const assignedTo = task.assignedTo;
-        //console.log(selectedUser[0]);
-        //console.log(selectedUser[0].email);
-        //const userEmail = selectedUser[0].email; // TODO: make a function to get the email for the user from the database.
         const subject = 'New Task Assigned';
         const html = `<p>A new task titled "${task.subject}" has been assigned to you by ${task.manager.firstName} ${task.manager.lastName}. Please check the Kaizen board for details. <a href="${process.env.WEBSITE_URL}/kaizen">Click here to view the task.</a></p>`;
 
@@ -116,6 +110,10 @@ exports.updateTask = async (req, res) => {
         if (result.matchedCount === 0) {
             return res.status(404).send({ error: 'Task not found.' });
         }
+        const subject = 'Task Updated';
+        const html = `<p>The task: "${task.subject}" that has been assigned to ${task.assignedTo.firstName} ${task.assignedTo.lastName}. Has been updated Please check the Kaizen board for details. <a href="${process.env.WEBSITE_URL}/kaizen">Click here to view the task.</a></p>`;
+        await mailService.sendEmail(task.manager.email, subject, html);
+
         res.send({ success: true });
     } catch (err) {
         res.status(500).send({ error: "Unable to update task."  });
@@ -141,6 +139,12 @@ exports.addComment = async (req, res) => {
         if (result.matchedCount === 0) {
             return res.status(404).send({ error: 'Task not found.' });
         }
+        const task = await dataBroker.getTasks(taskId);
+        const subject = 'User added comment to task';
+        const html = `<p>The task: "${task.subject}" has a new comment, added by ${comment.author.firstName} ${comment.author.lastName}. Please check the Kaizen board for details. <a href="${process.env.WEBSITE_URL}/kaizen">Click here to view the task.</a></p>`;
+
+        await mailService.sendEmail(task.manager.email, subject, html);
+
         res.send({ success: true, comment });
     } catch (err) {
         res.status(500).send({ error: "Unable to add comment." });
@@ -236,6 +240,12 @@ exports.deleteTask = async (req, res) => {
         if (result.deletedCount === 0) {
             return res.status(404).send({ error: 'Task not found.' });
         }
+
+        const task = await dataBroker.getTasks(taskId);
+        const subject = 'A task that was assigned to you, has been deleted';
+        const html = `<p>The task titled "${task.subject}" has been deleted by ${task.manager.firstName} ${task.manager.lastName}. Please contact the user if you think this is a mistake.  <a href="${process.env.WEBSITE_URL}/kaizen">Click here to view the board.</a></p>`;
+
+        await mailService.sendEmail(task.assignedTo.email, subject, html);
 
         res.send({ success: true });
     } catch (err) {

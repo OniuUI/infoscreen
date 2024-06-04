@@ -103,26 +103,31 @@ const CommentEntry: React.FC<CommentProps> = ({comment, task, setTask }) => {
                 )}
             </div>
             <div className="comment__actions">
-                <FontAwesomeIcon icon={isDropdownVisible ? faChevronUp : faChevronDown} onClick={toggleDropdown}/>
-                {isDropdownVisible && (  // Dropdown menu
-                    <div className="dropdown-menu">
-                        <div className="dropdown-item" onClick={() => {
-                            handleEdit();
-                            toggleDropdown();
-                        }}>Edit
-                        </div>
-                        <div className="dropdown-item" onClick={() => {
-                            handleDelete();
-                            toggleDropdown();
-                        }}>Delete
-                        </div>
-                    </div>
+                {comment.author.id === localStorage.getItem("userIdent") && (
+                    <>
+                        <FontAwesomeIcon icon={isDropdownVisible ? faChevronUp : faChevronDown} onClick={toggleDropdown}/>
+                        {isDropdownVisible && (  // Dropdown menu
+                            <div className="dropdown-menu">
+                                <div className="dropdown-item" onClick={() => {
+                                    handleEdit();
+                                    toggleDropdown();
+                                }}>Edit
+                                </div>
+                                <div className="dropdown-item" onClick={() => {
+                                    handleDelete();
+                                    toggleDropdown();
+                                }}>Delete
+                                </div>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
             {comment.edited && <div className="comment__edited-date">Last edited: {comment.lastEdited}</div>} {/* Display last edited date */}
         </div>
     );
 };
+
 
 
 export default CommentEntry;
