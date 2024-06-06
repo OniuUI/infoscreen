@@ -80,16 +80,19 @@ const CommentBox: React.FC<CommentBoxProps> = ({ task, setTask }) => {
     };
 
     return (
-        <form onSubmit={handleCommentSubmit} className="comment-form">
+        <form onSubmit={handleCommentSubmit} className="relative flex flex-col items-stretch">
             <textarea
                 value={comment}
                 onChange={handleCommentChange}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 placeholder="Add a comment"
+                className="w-full px-5 py-3 my-2 border border-gray-700 rounded box-border transition-colors bg-gray-900 text-blue-400 focus:border-blue-400 focus:ring-blue-400 focus:outline-none"
             />
             {isCommentFieldFocused && (
-                <button className="add-comment-button" type="submit">Add</button>
+                <button
+                    className="relative rounded-r-lg h-7 px-2 text-xs self-end bg-blue-500 hover:bg-blue-600 text-white text-center flex items-center justify-center"
+                    type="submit">Add</button>
             )}
         </form>
     );

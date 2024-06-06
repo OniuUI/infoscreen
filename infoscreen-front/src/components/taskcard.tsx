@@ -100,19 +100,18 @@ const Card: React.FC<CardProps> = ({users, task, manager, subject, dueBy, handle
 
 
     return (
-        <div className="card">
-            <div className="card__header">
+        <div className="mx-auto rounded shadow-md overflow-hidden flex flex-col bg-gray-900 text-blue-400">
+            <div className="text-left p-5 bg-gray-700 border-b border-brown-600">
                 <input type="text" value={editedSubject} onChange={handleSubjectChange} onBlur={handleSubjectBlur}
-                       readOnly={userRole !== 'admin' && userIdent !== localTask.manager._id}/>
+                       readOnly={userRole !== 'admin' && userIdent !== localTask.manager._id} className="w-full px-5 py-3 my-2 border border-gray-700 rounded box-border transition-colors bg-gray-900 text-blue-400 focus:border-blue-400 focus:ring-blue-400 focus:outline-none"/>
             </div>
-            <div className="card__body">
-                Description:
-                <textarea value={editedDescription} onChange={handleDescriptionChange} onBlur={handleDescriptionBlur}
-                          readOnly={userRole !== 'admin' && userIdent !== localTask.manager._id}/>
+            <div className="text-left p-5 flex-grow bg-white bg-opacity-10 text-green-300">
+            <textarea value={editedDescription} onChange={handleDescriptionChange} onBlur={handleDescriptionBlur}
+                      readOnly={userRole !== 'admin' && userIdent !== localTask.manager._id} className="w-full px-5 py-3 my-2 border border-gray-700 rounded box-border transition-colors bg-gray-900 text-blue-400 focus:border-blue-400 focus:ring-blue-400 focus:outline-none"/>
                 <p>Manager: {localTask.manager ? `${localTask.manager.firstName} ${localTask.manager.lastName}` : 'Unassigned'}</p>
                 <label>
                     Assigned to:
-                    <select value={selectedUser} onChange={handleUserChange}>
+                    <select value={selectedUser} onChange={handleUserChange} className="w-full px-5 py-3 my-2 border border-gray-700 rounded box-border transition-colors bg-gray-900 text-blue-400 focus:border-blue-400 focus:ring-blue-400 focus:outline-none">
                         {users.map((user) => (
                             <option key={user._id} value={user._id}>
                                 {user.firstName} {user.lastName}
@@ -124,7 +123,7 @@ const Card: React.FC<CardProps> = ({users, task, manager, subject, dueBy, handle
                 <label>
                     Due by:
                     <input type="date" value={editedDueBy} onChange={handleDueByChange} onBlur={handleDueByBlur}
-                           readOnly={userRole !== 'admin' && userIdent !== localTask.manager._id}/>
+                           readOnly={userRole !== 'admin' && userIdent !== localTask.manager._id} className="w-full px-5 py-3 my-2 border border-gray-700 rounded box-border transition-colors bg-gray-900 text-blue-400 focus:border-blue-400 focus:ring-blue-400 focus:outline-none"/>
                 </label>
                 <CommentBox task={localTask} setTask={setLocalTask} />
                 {localTask.comments && localTask.comments.map((comment: Comment) => (
@@ -136,9 +135,9 @@ const Card: React.FC<CardProps> = ({users, task, manager, subject, dueBy, handle
                     />
                 ))}
             </div>
-            <div className="card__footer">
+            <div className="text-left p-5 bg-red-400 border-b border-brown-600">
                 {((localTask.manager._id === manager._id) || (localStorage.getItem("role") === 'Admin')) && (
-                    <button className="delete-button" onClick={handleDelete}>Delete</button>
+                    <button className="w-full text-gray-900 py-3.5 my-2 border-none rounded cursor-pointer transition-colors hover:bg-red-700" onClick={handleDelete}>Delete</button>
                 )}
             </div>
         </div>

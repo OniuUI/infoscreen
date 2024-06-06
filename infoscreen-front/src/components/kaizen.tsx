@@ -8,6 +8,7 @@ import {User, Task, Comment } from './utils/types';
 import './css/kaizen.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faMinus, faPlus} from '@fortawesome/free-solid-svg-icons';
+import KaizenNavbar from "./kaizennav";
 
 interface TaskProps {
     title: string;
@@ -319,13 +320,13 @@ const Kaizen: React.FC = () => {
         setColumns(newColumns);
     };
 
-
+//TODO: Move the TaskColumn component to a separate file
 
     const TaskColumn: React.FC<TaskProps> = ({ title, tasks, users }) => (
         <Droppable droppableId={title}>
             {(provided) => (
                 <div {...provided.droppableProps} ref={provided.innerRef} className="task-column">
-                    <h2>{title}</h2>
+                    <h2 className="text-white">{title}</h2>
                     {tasks.map((task: Task, index: number) => (
                         task && task.id ? (
                             <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
@@ -353,8 +354,10 @@ const Kaizen: React.FC = () => {
 
 
     return (
+        <>
+            <KaizenNavbar />
         <DragDropContext onDragEnd={onDragEnd}>
-            <div className="task-board">
+            <div className="bg-gray-900 text-blue-400 task-board" >
                 {columns.map((column, index) => (
                     <div key={index}>
                         <TaskColumn title={column.title} tasks={column.tasks} users={users} />
@@ -419,6 +422,7 @@ const Kaizen: React.FC = () => {
                 ))}
             </div>
         </DragDropContext>
+        </>
     );
 };
 

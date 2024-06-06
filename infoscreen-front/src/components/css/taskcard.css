@@ -7,7 +7,7 @@
 }
 
 .card {
-    width: 300px;
+    width: 100%;
     margin: 0 auto;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
@@ -76,23 +76,8 @@
     width: 100px;
 }
 
-input[type="text"], input[type="date"], select {
-    width: 100%;
-    padding: 12px 20px;
-    margin: 8px 0;
-    display: inline-block;
-    border: 1px solid var(--dim-gray);
-    border-radius: 4px;
-    box-sizing: border-box;
-    transition: all 0.3s ease-out;
-    background-color: var(--jet);
-    color: var(--celestial-blue);
-}
-
-input[type="text"]:focus, input[type="date"]:focus, select:focus {
-    border: 1px solid var(--celestial-blue);
-    box-shadow: 0 0 5px var(--celestial-blue);
-    outline: none;
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
 }
 
 button {
