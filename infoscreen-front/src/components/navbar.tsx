@@ -14,31 +14,35 @@ const NavBar: React.FC = () => {
     const currentMonth = monthFormatter.format(currentDate);
     const currentDayName = weekdayFormatter.format(currentDate);
 
+    // Find the index of the current date in the dates array
+    const currentDateIndex = datesInCurrentMonth.findIndex(date => date.getDate() === currentDate.getDate());
+
     return (
-        <header>
-            <div className="nav-items">
+        <header className="flex flex-row justify-between items-center p-4 bg-blue-500">
+            <div className="flex flex-row items-center space-x-4">
                 {/* other nav items here */}
             </div>
             {/* Display the current day's name once at the end */}
-            <div className="current-day-white">
-                <span>{currentDayName.toUpperCase()}</span>
+            <div className="text-white">
+                <span className="uppercase">{currentDayName}</span>
             </div>
-            <div className="dates-container">
+            <div className="flex flex-row space-x-2 p-2 rounded">
                 {datesInCurrentMonth.map((date, index) => (
                     <span
                         key={index}
-                        className={`date-item${date.getDate() === currentDate.getDate() ? ' active' : ''}`}
+                        className={`p-1 rounded-full text-center ${date.getDate() === currentDate.getDate() ? 'text-9xl bg-blue-700 text-white' : 'text-blue-200'}`}
+                        style={{ fontSize: `${index === currentDateIndex ? '28px' : index === currentDateIndex - 1 || index === currentDateIndex + 1 ? '24px' : '20px'}` }}
                     >
                         {date.getDate()}
                     </span>
                 ))}
             </div>
             {/* Display the current month once at the beginning */}
-            <div className="current-month-white">
-                <span>{currentMonth.toUpperCase()}</span>
+            <div className="text-white">
+                <span className="uppercase">{currentMonth}</span>
             </div>
-            <div className="logo-container">
-                <img src={logo} alt="Logo" className="logo" />
+            <div className="flex items-center">
+                <img src={logo} alt="Logo" className="h-8 w-auto" />
             </div>
         </header>
     );

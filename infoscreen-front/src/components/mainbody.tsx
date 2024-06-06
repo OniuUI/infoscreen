@@ -98,7 +98,7 @@ const Container: React.FC = () => {
         <div className="flex flex-col">
             <NavBar />
             <div className="flex flex-row">
-                <div className="w-1/4">
+                <div className="w-1/3">
                     <LeftSidebar />
                 </div>
                 <main className="flex-grow">
@@ -113,9 +113,7 @@ const Container: React.FC = () => {
                         })}
                     </div>
                 </main>
-                <div className="w-1/4">
-                    <RightSidebar />
-                </div>
+
             </div>
         </div>
     );

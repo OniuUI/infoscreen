@@ -62,18 +62,18 @@ const LeftSidebar: React.FC = () => {
   }, []);
 
   return (
-    <div className="left-sidebar">
-      {users.map((user, index) => (
-        <Person
-          key={index}
-          firstName={user.firstName}
-          lastName={user.lastName}
-          daysToBirthday={user.daysToBirthday || 0} // Pass daysToBirthday as a prop
-          imageUrl={user.imageUrl}
-        />
+      <div className="h-full bg-blue-400 p-4 overflow-auto">
+        {users.map((user, index) => (
+            <Person
+                key={index}
+                firstName={user.firstName}
+                lastName={user.lastName}
+                daysToBirthday={user.daysToBirthday || 0} // Pass daysToBirthday as a prop
+                imageUrl={user.imageUrl}
+            />
         ))}
-    </div>
-    );
+      </div>
+  );
 };
 
 export default LeftSidebar;
