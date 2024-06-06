@@ -5,7 +5,6 @@
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
-    "@material-tailwind/react": "^2.0.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -14,8 +13,10 @@
     "@types/react": "^18.2.5",
     "@types/react-dom": "^18.2.3",
     "@types/react-router-dom": "^5.3.3",
+    "autoprefixer": "^10.4.19",
     "axios": "^1.4.0",
     "date-fns": "^2.30.0",
+    "postcss-cli": "^11.0.0",
     "react": "^18.2.0",
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.2.0",
@@ -30,8 +31,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "npm run build:css && react-scripts start",
+    "build": "npm run build:css && react-scripts build",
+    "build:css": "postcss src/index.css -o src/tailwind.css",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -57,6 +59,7 @@
     "@types/react-beautiful-dnd": "^13.1.8",
     "@types/react-grid-layout": "^1.3.2",
     "@types/react-lottie": "^1.2.6",
-    "@types/uuid": "^9.0.1"
+    "@types/uuid": "^9.0.1",
+    "tailwindcss": "^3.4.4"
   }
 }

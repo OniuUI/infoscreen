@@ -15,6 +15,7 @@ import DeparturesDisplay from "./ruter/ruter";
 import RightSidebar from "./rightsidebar";
 import {apiService} from "./api/apiservice";
 import Kaizen from "./kaizen";
+import ReadOnlyKaizenBoard from "./kaizenview";
 
 interface ComponentInterface {
     _id: {
@@ -36,7 +37,8 @@ const componentMapping: { [key: string]: React.FC<any> } = {
     'NewsFeed': NewsFeed,
     'Gallery': Gallery,
     'DeparturesDisplay': DeparturesDisplay,
-    "Kaizen": Kaizen
+    "Kaizen": Kaizen,
+    "ReadOnlyKaizenBoard": ReadOnlyKaizenBoard,
 };
 
 const Container: React.FC = () => {
@@ -93,23 +95,27 @@ const Container: React.FC = () => {
     }, []);
 
     return (
-        <div className="container">
+        <div className="flex flex-col">
             <NavBar />
-            <div className="content">
-                <LeftSidebar />
-                <main>
-                    <div className="grid">
+            <div className="flex flex-row">
+                <div className="w-1/4">
+                    <LeftSidebar />
+                </div>
+                <main className="flex-grow">
+                    <div className="flex flex-row h-full w-full">
                         {components.map((componentName, index) => {
                             const Component = componentMapping[componentName];
                             return (
-                                <SquareField key={index} className={components.length === 1 ? 'full-size' : 'square-field'}>
+                                <div key={index} className={components.length === 1 ? 'w-full h-full' : 'w-full'}>
                                     <Component />
-                                </SquareField>
+                                </div>
                             );
                         })}
                     </div>
                 </main>
-                <RightSidebar />
+                <div className="w-1/4">
+                    <RightSidebar />
+                </div>
             </div>
         </div>
     );
