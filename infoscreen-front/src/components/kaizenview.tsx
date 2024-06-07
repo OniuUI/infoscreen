@@ -63,7 +63,7 @@ const ReadOnlyKaizenBoard: React.FC = () => {
                             <div className="task bg-white p-4 mb-4 rounded-lg shadow-sm" key={task.id}>
                                 <h3 className="text-lg font-semibold">{task.subject}</h3>
                                 <p className="text-gray-700">{task.description}</p>
-                                {task.comments.map(comment => (
+                                {task.comments?.map(comment => (
                                     <div className="comment mt-2 p-2 bg-gray-50 rounded-md" key={comment.id}>
                                         <p className="comment__text">
                                             <span className="comment__author font-semibold">{comment.author.firstName} {comment.author.lastName}</span> - {comment.text} - <br /> <span className="text-xs text-gray-500">{comment.created}</span>
