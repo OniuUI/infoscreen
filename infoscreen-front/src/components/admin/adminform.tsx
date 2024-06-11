@@ -200,101 +200,101 @@ const AdminForm: React.FC = () => {
   };
 
   return (
-    <div className="form-container">
-      <h1>{selectedUser ? "Edit User" : "Add User"}</h1>
-      <form onSubmit={handleSubmit} className="admin-form">
-        <label>
-          Select User:
-          <select onChange={handleUserChange} value={selectedUser?._id || ""}>
-            <option value="">New User</option>
-            {users.map((user) => (
-                <option key={user._id} value={user._id}>
-                  {user.firstName} {user.lastName}
-                </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          First Name:
-          <input
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-              className="form-input"
-          />
-        </label>
-        <label>
-          Last Name:
-          <input
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              required
-              className="form-input"
-          />
-        </label>
-        <label>
-          Birthdate:
-          <input
-              type="date"
-              value={birthdate}
-              onChange={(e) => setBirthdate(e.target.value)}
-              required
-              className="form-input"
-          />
-        </label>
-        <label>
-          Image URL:
-          <input
-              type="url"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              required
-              className="form-input"
-          />
-        </label>
-        <label>
-          Email:
-          <input
-              type="email"
-              value={email}
-              onChange={handleEmailChange}
-              required
-              className="form-input"
-          />
-        </label>
-        <label>
-          Password:
-          <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="form-input"
-          />
-        </label>
-        <button type="submit" className="form-button">{selectedUser ? "Update User" : "Add User"}</button>
-        {selectedUser &&
-            <button type="button" onClick={() => {
-              handleRoleDelete();
-              handleDelete();
-            }} className="form-button-delete">Delete User</button>
-        }
-        <label>
-          Role:
-          <select value={selectedRole} onChange={(e) => {
-            setSelectedRole(e.target.value);
-          }}>
-            {roles.map((role) => (
-                <option key={role._id} value={role.name}>
-                  {role.name}
-                </option>
-            ))}
-          </select>
-        </label>
-      </form>
-    </div>
+      <div className="flex flex-col items-center justify-center">
+        <h1 className="text-2xl font-bold mb-4">{selectedUser ? "Edit User" : "Add User"}</h1>
+        <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+          <label className="flex flex-col mb-2 text-sm">
+            Select User:
+            <select onChange={handleUserChange} value={selectedUser?._id || ""} className="mt-1 p-2 rounded border border-gray-300">
+              <option value="">New User</option>
+              {users.map((user) => (
+                  <option key={user._id} value={user._id}>
+                    {user.firstName} {user.lastName}
+                  </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex flex-col mb-2 text-sm">
+            First Name:
+            <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+                className="mt-1 p-2 rounded border border-gray-300"
+            />
+          </label>
+          <label className="flex flex-col mb-2 text-sm">
+            Last Name:
+            <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
+                className="mt-1 p-2 rounded border border-gray-300"
+            />
+          </label>
+          <label className="flex flex-col mb-2 text-sm">
+            Birthdate:
+            <input
+                type="date"
+                value={birthdate}
+                onChange={(e) => setBirthdate(e.target.value)}
+                required
+                className="mt-1 p-2 rounded border border-gray-300"
+            />
+          </label>
+          <label className="flex flex-col mb-2 text-sm">
+            Image URL:
+            <input
+                type="url"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                required
+                className="mt-1 p-2 rounded border border-gray-300"
+            />
+          </label>
+          <label className="flex flex-col mb-2 text-sm">
+            Email:
+            <input
+                type="email"
+                value={email}
+                onChange={handleEmailChange}
+                required
+                className="mt-1 p-2 rounded border border-gray-300"
+            />
+          </label>
+          <label className="flex flex-col mb-2 text-sm">
+            Password:
+            <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="mt-1 p-2 rounded border border-gray-300"
+            />
+          </label>
+          <button type="submit" className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-700 transition-colors duration-200">{selectedUser ? "Update User" : "Add User"}</button>
+          {selectedUser &&
+              <button type="button" onClick={() => {
+                handleRoleDelete();
+                handleDelete();
+              }} className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-700 transition-colors duration-200">Delete User</button>
+          }
+          <label className="flex flex-col mb-2 text-sm">
+            Role:
+            <select value={selectedRole} onChange={(e) => {
+              setSelectedRole(e.target.value);
+            }} className="mt-1 p-2 rounded border border-gray-300">
+              {roles.map((role) => (
+                  <option key={role._id} value={role.name}>
+                    {role.name}
+                  </option>
+              ))}
+            </select>
+          </label>
+        </form>
+      </div>
   );
 };
 
