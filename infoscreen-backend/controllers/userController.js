@@ -199,6 +199,46 @@ exports.updateUserById = async (userId, updatedUser) => {
 
 /**
  * @openapi
+ * /api/users/{id}/image:
+ *   get:
+ *      tags:
+ *        - User
+ *   description: Returns the image of a specific user
+ *   parameters:
+ *     - name: id
+ *       in: path
+ *       required: true
+ *       description: ID of the user to retrieve the image for
+ *       schema:
+ *         type: string
+ *   responses:
+ *     200:
+ *       description: User image.
+ *     404:
+ *       description: User not found.
+ *     500:
+ *       description: Unable to fetch user image.
+ */
+exports.getImageByUserId = async (req, res) => {
+    try {
+        const db = getDb();
+        const userId = req.params.id;
+        const user = await db.collection('users').findOne({ _id: userId });
+
+        if (!user) {
+            return res.status(404).send({ error: 'User not found.' });
+        }
+
+        // Assuming the user object has an 'imageUrl' property
+        res.send({ imageUrl: user.imageUrl });
+    } catch (err) {
+        res.status(500).send({ error: "Unable to fetch user image." });
+    }
+};
+
+
+/**
+ * @openapi
  * /api/users/{id}:
  *   delete:
  *      tags:

@@ -16,6 +16,7 @@ export interface Task {
     assignedTo: User;
     status: string;
     comments: Comment[];
+    imageUrl: string;
 }
 
 export interface User {
