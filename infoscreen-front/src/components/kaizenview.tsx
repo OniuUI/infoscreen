@@ -14,8 +14,8 @@ const TaskComponent: React.FC<{ task: Task, imageUrl: string }> = ({ task, image
             <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold">{task.subject}</h3>
                 <div className="flex items-center">
-                    <img src={imageUrl} alt={task.assignedTo.firstName} className="w-6 h-6 rounded-full" />
-                    <span className="ml-2">{task.assignedTo.firstName}</span>
+                    <img src={imageUrl} alt={task.assignedTo?.firstName} className="w-6 h-6 rounded-full" />
+                    <span className="ml-2">{task.assignedTo?.firstName}</span>
                 </div>
             </div>
             <p className="text-gray-700">{task.description}</p>
@@ -55,15 +55,21 @@ const ReadOnlyKaizenBoard: React.FC = () => {
 
                 const tasksWithImages = await Promise.all(tasks.map(async (task) => {
                     // Check if the image for the user already exists in the state
-                    if (userImages[task.assignedTo._id]) {
-                        return { ...task, imageUrl: userImages[task.assignedTo._id] };
+                    if (userImages[task.assignedTo?._id]) {
+                        return { ...task, imageUrl: userImages[task.assignedTo?._id] };
                     } else {
                         // If not, fetch it from the API and add it to the state
-                        const data = await apiService.get(`/users/${task.assignedTo._id}/image`);
-                        const imageUrl = data.imageUrl;
-                        console.log('User image URL:', imageUrl);
-                        setUserImages(prevState => ({ ...prevState, [task.assignedTo._id]: imageUrl}));
-                        return { ...task, imageUrl };
+                        try {
+                            const data = await apiService.get(`/users/${task.assignedTo?._id}/image`);
+                            const imageUrl = data.imageUrl;
+                            console.log('User image URL:', imageUrl);
+                            setUserImages(prevState => ({ ...prevState, [task.assignedTo?._id]: imageUrl }));
+                            return { ...task, imageUrl };
+                        }
+                        catch (error) {
+                            console.error('Error fetching user image:', error);
+                            return { ...task, imageUrl: '' };
+                        }
                     }
                 }));
 

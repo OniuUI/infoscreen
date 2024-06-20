@@ -137,6 +137,8 @@ const Kaizen: React.FC = () => {
 
     const handleNewTaskSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
+        const blankUser = { _id: '', firstName: '', lastName: '', email: '', birthdate: '', imageUrl: '', coffee: 0, soda: 0, password: '', refreshToken: '', role: ''};
+
 
         try {
             const managerUser = managersAndAdmins.find(user => user._id === newTask.manager);
@@ -144,7 +146,7 @@ const Kaizen: React.FC = () => {
                 console.error('User not found:', newTask.manager);
                 return;
             }
-            let assignedUser = null;
+            let assignedUser: User = blankUser;
             if (assignToUser) {
                 const foundUser = users.find(user => user._id === newTask.assignedTo);
                 if (!foundUser) {
