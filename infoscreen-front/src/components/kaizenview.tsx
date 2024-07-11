@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { apiService } from "./api/apiservice";
 import { User, Task, Comment } from './utils/types';
+import ProgressComponent from "./progressComponent";
 
 interface Column {
     title: string;
@@ -101,21 +102,32 @@ const ReadOnlyKaizenBoard: React.FC = () => {
         return () => clearInterval(intervalId);
     }, []);
 
+    // Inside ReadOnlyKaizenBoard component, right before the return statement in the render function
+
     return (
         <div>
             <div className="bg-green-600 text-white p-4 mb-4">
                 Eye-share kaizenboard.
             </div>
             <div className="kaizen-board flex justify-between space-x-4 p-4">
+                {columns.map(column => {
+                    // Step 1: Calculate totalTasks
+                    const totalTasks = column.tasks.length;
 
-                {columns.map(column => (
-                    <div className="column bg-gray-100 p-4 rounded-lg shadow-md" key={column.title}>
-                        <h2 className="text-xl font-bold mb-4">{column.title}</h2>
-                        {column.tasks.map(task => (
-                            <TaskComponent task={task} key={task.id} imageUrl={task.imageUrl} />
-                        ))}
-                    </div>
-                ))}
+                    // Step 2: Calculate completedTasks
+                    const completedTasks = column.tasks.filter(task => task.status === 'Completed').length;
+
+                    return (
+                        <div className="column bg-gray-100 p-4 rounded-lg shadow-md" key={column.title}>
+                            {/* Step 3: Pass totalTasks and completedTasks to ProgressComponent */}
+                            <ProgressComponent totalTasks={totalTasks} completedTasks={completedTasks} />
+                            <h2 className="text-xl font-bold mb-4">{column.title}</h2>
+                            {column.tasks.map(task => (
+                                <TaskComponent task={task} key={task.id} imageUrl={task.imageUrl} />
+                            ))}
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );
