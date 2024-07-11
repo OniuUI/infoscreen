@@ -4,7 +4,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import Card from './taskcard';
 import {apiService} from "./api/apiservice";
 import { v4 as uuidv4 } from 'uuid';
-import {User, Task, Comment } from './utils/types';
+import {User, Task, Comment, Column } from './utils/types';
 import './css/kaizen.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faMinus, faPlus} from '@fortawesome/free-solid-svg-icons';
@@ -14,11 +14,6 @@ interface TaskProps {
     title: string;
     tasks: Task[];
     users: User[];
-}
-
-interface Column {
-    title: string;
-    tasks: Task[];
 }
 
 interface completeProps {
@@ -178,7 +173,7 @@ const Kaizen: React.FC = () => {
     const handleStatusChange = async (task: Task, event: React.ChangeEvent<HTMLSelectElement>) => {
         try {
             await apiService.put(`/kaizen/updateTask/${task.id}`, { ...task, status: event.target.value });
-            // Add code here to move the task to the corresponding column in the frontend
+
         } catch (error) {
             console.error('Failed to change task status:', error);
         }

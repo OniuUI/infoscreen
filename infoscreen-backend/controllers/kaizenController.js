@@ -232,13 +232,13 @@ exports.deleteTask = async (req, res) => {
         const role = await accessController.getRoleByUserId(userIdent);
 
         if (role !== 'admin' && role !== 'manager') {
-            return res.status(403).send({ error: 'You do not have the right permissions to delete this task.' });
+            return res.status(403).send({error: 'You do not have the right permissions to delete this task.'});
         }
 
-        const result = await db.collection('tasks').deleteOne({ id: taskId });
+        const result = await db.collection('tasks').deleteOne({id: taskId});
 
         if (result.deletedCount === 0) {
-            return res.status(404).send({ error: 'Task not found.' });
+            return res.status(404).send({error: 'Task not found.'});
         }
 
         const task = await dataBroker.getTasks(taskId);
@@ -247,8 +247,195 @@ exports.deleteTask = async (req, res) => {
 
         await mailService.sendEmail(task.assignedTo.email, subject, html);
 
-        res.send({ success: true });
+        res.send({success: true});
     } catch (err) {
-        res.status(500).send({ error: "Unable to delete task." });
+        res.status(500).send({error: "Unable to delete task."});
     }
 };
+//Categories
+    /**
+     * @swagger
+     * /categories:
+     *   post:
+     *     tags: [Kaizen]
+     *     summary: Create a new category
+     *     description: Adds a new category to the system.
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required:
+     *               - title
+     *             properties:
+     *               title:
+     *                 type: string
+     *                 description: The title of the category.
+     *               tasks:
+     *                 type: array
+     *                 items:
+     *                   type: object
+     *                   properties:
+     *                     id:
+     *                       type: string
+     *                     title:
+     *                       type: string
+     *                     description:
+     *                       type: string
+     *                     status:
+     *                       type: string
+     *                     assignedTo:
+     *                       type: string
+     *     responses:
+     *       201:
+     *         description: Category created successfully.
+     *       500:
+     *         description: Server error.
+     */
+    exports.createCategory = async (req, res) => {
+        try {
+            const db = getDb();
+            const { title, tasks = [] } = req.body; // Destructure title and tasks from request body, default tasks to an empty array if not provided
+            const result = await db.collection('categories').insertOne({ title, tasks });
+
+            res.status(201).send({ success: true, category: { ...req.body, _id: result.insertedId } });
+        } catch (err) {
+            console.error(err);
+            res.status(500).send({ error: "Unable to create category." });
+        }
+    };
+
+    /**
+     * @swagger
+     * /categories:
+     *   get:
+     *     tags: [Kaizen]
+     *     summary: Fetch all categories
+     *     description: Retrieves a list of all categories and their tasks.
+     *     responses:
+     *       200:
+     *         description: A list of categories.
+     *       500:
+     *         description: Server error.
+     */
+    exports.fetchCategories = async (req, res) => {
+        try {
+            const db = getDb();
+            const categories = await db.collection('categories').find().toArray();
+
+            res.send(categories);
+        } catch (err) {
+            console.error(err);
+            res.status(500).send({ error: "Unable to fetch categories." });
+        }
+    };
+
+    /**
+     * @swagger
+     * /categories/{id}:
+     *   put:
+     *     tags: [Kaizen]
+     *     summary: Update an existing category
+     *     description: Updates the details of an existing category.
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         schema:
+     *           type: string
+     *         description: The ID of the category to update.
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               title:
+     *                 type: string
+     *                 description: The new title of the category.
+     *               tasks:
+     *                 type: array
+     *                 items:
+     *                   type: object
+     *                   properties:
+     *                     id:
+     *                       type: string
+     *                     title:
+     *                       type: string
+     *                     description:
+     *                       type: string
+     *                     status:
+     *                       type: string
+     *                     assignedTo:
+     *                       type: string
+     *     responses:
+     *       200:
+     *         description: Category updated successfully.
+     *       404:
+     *         description: Category not found.
+     *       500:
+     *         description: Server error.
+     */
+    exports.updateCategory = async (req, res) => {
+        try {
+            const db = getDb();
+            const categoryId = req.params.id;
+            const updates = req.body;
+
+            const result = await db.collection('categories').updateOne(
+                { _id: categoryId },
+                { $set: updates }
+            );
+
+            if (result.matchedCount === 0) {
+                return res.status(404).send({ error: 'Category not found.' });
+            }
+
+            res.send({ success: true });
+        } catch (err) {
+            console.error(err);
+            res.status(500).send({ error: "Unable to update category." });
+        }
+    };
+
+    /**
+     * @swagger
+     * /categories/{id}:
+     *   delete:
+     *     tags: [Kaizen]
+     *     summary: Delete a category by its identifier
+     *     description: Deletes a category from the system by its unique identifier.
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         schema:
+     *           type: string
+     *         description: The unique identifier of the category to delete.
+     *     responses:
+     *       200:
+     *         description: Category deleted successfully.
+     *       404:
+     *         description: Category not found.
+     *       500:
+     *         description: Server error.
+     */
+    exports.deleteCategory = async (req, res) => {
+        try {
+            const db = getDb();
+            const categoryId = req.params.id;
+
+            const result = await db.collection('categories').deleteOne({ _id: categoryId });
+
+            if (result.deletedCount === 0) {
+                return res.status(404).send({ error: 'Category not found.' });
+            }
+
+            res.send({ success: true });
+        } catch (err) {
+            console.error(err);
+            res.status(500).send({ error: "Unable to delete category." });
+        }
+    };
