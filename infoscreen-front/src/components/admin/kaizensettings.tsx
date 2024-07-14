@@ -3,7 +3,7 @@ import { addCategory, deleteCategory, fetchCategories, updateCategory } from '..
 import { Column } from '../utils/types';
 
 interface EditCategory {
-    id: any;
+    id: string;
     title: string;
 }
 
@@ -38,7 +38,7 @@ const KaizenSettings: React.FC<Props> = () => {
         setNewCategoryName('');
     };
 
-    const handleDeleteCategory = async (categoryId: number) => {
+    const handleDeleteCategory = async (categoryId: string) => {
         const success = await deleteCategory(categoryId);
         if (success) {
             setCategories(categories.filter(category => category.id !== categoryId));
