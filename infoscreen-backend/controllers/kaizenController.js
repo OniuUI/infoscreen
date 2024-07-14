@@ -2,7 +2,7 @@ const accessController = require('./accessController');
 const {getDb} = require("../db");
 const mailService = require("../mailservice/mailService");
 const DataBroker = require("../utils/databroker");
-
+const { v4: uuidv4 } = require('uuid');
 const dataBroker = new DataBroker();
 
 /**
@@ -296,10 +296,12 @@ exports.deleteTask = async (req, res) => {
     exports.createCategory = async (req, res) => {
         try {
             const db = getDb();
-            const { title, tasks = [] } = req.body; // Destructure title and tasks from request body, default tasks to an empty array if not provided
-            const result = await db.collection('categories').insertOne({ title, tasks });
+            const { title, tasks = [] } = req.body;
+            // Generate a GUID for the ID
+            const id = uuidv4();
+            const result = await db.collection('categories').insertOne({ id, title, tasks });
 
-            res.status(201).send({ success: true, category: { ...req.body, _id: result.insertedId } });
+            res.status(201).send({ success: true, category: { ...req.body, id } });
         } catch (err) {
             console.error(err);
             res.status(500).send({ error: "Unable to create category." });
@@ -324,7 +326,7 @@ exports.deleteTask = async (req, res) => {
             const db = getDb();
             const categories = await db.collection('categories').find().toArray();
             console.log("categories", categories)
-            res.send(categories);
+            res.send({categories: categories});
         } catch (err) {
             console.error(err);
             res.status(500).send({ error: "Unable to fetch categories." });
@@ -385,7 +387,7 @@ exports.deleteTask = async (req, res) => {
             const updates = req.body;
 
             const result = await db.collection('categories').updateOne(
-                { _id: categoryId },
+                { id: categoryId },
                 { $set: updates }
             );
 
@@ -393,7 +395,11 @@ exports.deleteTask = async (req, res) => {
                 return res.status(404).send({ error: 'Category not found.' });
             }
 
-            res.send({ success: true });
+            // Retrieve the updated category
+            const updatedCategory = await db.collection('categories').findOne({ id: categoryId });
+
+            // Send the updated category in the response
+            res.send({ success: true, category: updatedCategory });
         } catch (err) {
             console.error(err);
             res.status(500).send({ error: "Unable to update category." });
@@ -427,7 +433,7 @@ exports.deleteTask = async (req, res) => {
             const db = getDb();
             const categoryId = req.params.id;
 
-            const result = await db.collection('categories').deleteOne({ _id: categoryId });
+            const result = await db.collection('categories').deleteOne({ id: categoryId });
 
             if (result.deletedCount === 0) {
                 return res.status(404).send({ error: 'Category not found.' });

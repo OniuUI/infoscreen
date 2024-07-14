@@ -1,17 +1,13 @@
-import { apiService } from '../components/api/apiservice'; // Adjust the import path as necessary
+import { apiService } from '../components/api/apiservice';
+import {generateUniqueID} from "web-vitals/dist/modules/lib/generateUniqueID"; // Adjust the import path as necessary
 
 // Fetch categories from the server
 export const fetchCategories = async () => {
     try {
         const response = await apiService.get('/kaizen/categories');
-        if (Array.isArray(response.categories)) {
-            console.log('Fetched categories is categories:', response.categories); // Debugging line
+            console.log('Fetched categories:', response.categories); // Debugging line
             return response.categories;
-        } else {
-            console.log('Invalid categories data:', response);
-            console.error('Invalid categories data:', response.categories);
-            return [];
-        }
+
     } catch (error) {
         console.error('Error fetching categories:', error);
         return [];
@@ -21,7 +17,7 @@ export const fetchCategories = async () => {
 // Add a new category
 export const addCategory = async (categoryName: string) => {
     try {
-        const response = await apiService.post('/kaizen/categories', { id: Math.random(), title: categoryName });
+        const response = await apiService.post('/kaizen/categories', { title: categoryName });
         return response.category; // Assuming the API returns the added category
     } catch (error) {
         console.error('Error adding category:', error);
@@ -30,7 +26,7 @@ export const addCategory = async (categoryName: string) => {
 };
 
 // Delete a category by ID
-export const deleteCategory = async (categoryId: number) => {
+export const deleteCategory = async (categoryId: any) => {
     try {
         await apiService.delete(`/kaizen/categories/${categoryId}`);
         return true;
@@ -41,10 +37,12 @@ export const deleteCategory = async (categoryId: number) => {
 };
 
 // Update a category by ID
-export const updateCategory = async (categoryId: number, categoryName: string) => {
+export const updateCategory = async (categoryId: string, categoryName: string) => {
     try {
-        const response = await apiService.put(`/kaizen/categories/${categoryId}`, {id: categoryId, title: categoryName });
-        return response.data; // Assuming the API returns the updated category
+        // Adjust the API call to match the expected response structure
+        const response = await apiService.put(`/kaizen/categories/${categoryId}`, { title: categoryName });
+        // Assuming the API now returns the updated category object directly
+        return response.category; // Adjust this line based on the actual response structure
     } catch (error) {
         console.error('Error updating category:', error);
         return null;

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import {addCategory, deleteCategory, fetchCategories, updateCategory} from '../../service/CategoryService';
+import { addCategory, deleteCategory, fetchCategories, updateCategory } from '../../service/CategoryService';
 import { Column } from '../utils/types';
 
 interface EditCategory {
-    id: number;
+    id: any;
     title: string;
 }
 
@@ -16,14 +16,9 @@ const KaizenSettings: React.FC<Props> = () => {
 
     useEffect(() => {
         const fetchAndSetCategories = async () => {
-            try {
-                const fetchedCategories = await fetchCategories();
-                console.log('Fetched Categories:', fetchedCategories); // Debugging line
-                if (fetchedCategories) {
-                    setCategories(fetchedCategories);
-                }
-            } catch (error) {
-                console.error('Failed to fetch categories:', error);
+            const fetchedCategories = await fetchCategories();
+            if (fetchedCategories) {
+                setCategories(fetchedCategories);
             }
         };
 
@@ -35,27 +30,43 @@ const KaizenSettings: React.FC<Props> = () => {
         if (!newCategoryName.trim()) return;
         const newCategory = await addCategory(newCategoryName);
         if (newCategory) {
-            setCategories([...categories, newCategory]);
+            const updatedCategories = [...categories, newCategory];
+            setCategories(updatedCategories);
+            // Immediately set the new category as editing category to show the edit view
+            setEditingCategory({ id: newCategory.id, title: newCategory.title });
         }
         setNewCategoryName('');
     };
 
     const handleDeleteCategory = async (categoryId: number) => {
-        await deleteCategory(categoryId);
-        setCategories(categories.filter(category => category.id !== categoryId));
+        const success = await deleteCategory(categoryId);
+        if (success) {
+            setCategories(categories.filter(category => category.id !== categoryId));
+        }
     };
 
-    const handleEditCategory = async (e: React.FormEvent, categoryId: number) => {
+    const handleEditCategory = async (e: React.FormEvent, categoryId: string) => {
         e.preventDefault();
         if (editingCategory && editingCategory.title.trim()) {
-            await updateCategory(categoryId, editingCategory.title);
-            const updatedCategories = categories.map(category =>
-                category.id === categoryId ? { ...category, name: editingCategory.title } : category
-            );
-            setCategories(updatedCategories);
+            const updatedCategory = await updateCategory(categoryId, editingCategory.title);
+            console.log('Updated category:', updatedCategory)
+            if (updatedCategory) {
+                console.log('Updated category:', updatedCategory)
+                const index = categories.findIndex(category => category.id === updatedCategory.id);
+                if (index !== -1) {
+                    const updatedCategories = [
+                        ...categories.slice(0, index),
+                        updatedCategory,
+                        ...categories.slice(index + 1)
+                    ];
+                    console.log('Updated categories:', updatedCategories);
+                    setCategories(updatedCategories);
+                }
+            }
             setEditingCategory(null); // Reset editing state
         }
     };
+
     return (
         <div className="max-w-xl mx-auto py-8">
             <h2 className="text-2xl font-bold mb-4">Category Settings</h2>
@@ -72,19 +83,28 @@ const KaizenSettings: React.FC<Props> = () => {
             </form>
             <ul className="mt-6">
                 {categories.map(category => (
-                    <li key={category.id} className="border-b border-gray-200 last:border-b-0 py-2">
+                    <li key={category.id}
+                        className="border-b border-gray-200 last:border-b-0 py-2">
                         {editingCategory?.id === category.id ? (
                             <form onSubmit={(e) => handleEditCategory(e, category.id)} className="flex gap-2">
                                 <input
                                     type="text"
-                                    value={editingCategory.title}
-                                    onChange={(e) => setEditingCategory({...editingCategory, title: e.target.value})}
+                                    value={editingCategory?.title || ''}
+                                    onChange={(e) => {
+                                        if (editingCategory) {
+                                            setEditingCategory({
+                                                ...editingCategory,
+                                                title: e.target.value,
+                                                // Ensure _id is always included. If editingCategory is null, this code won't execute.
+                                            });
+                                        }
+                                    }}
                                     className="flex-1 border border-gray-300 p-2 rounded-md"
                                 />
                                 <button type="submit"
                                         className="bg-green-500 text-white p-2 rounded-md hover:bg-green-600">Save
                                 </button>
-                                <button onClick={() => setEditingCategory(null)}
+                                <button type="button" onClick={() => setEditingCategory(null)}
                                         className="bg-red-500 text-white p-2 rounded-md hover:bg-red-600">Cancel
                                 </button>
                             </form>

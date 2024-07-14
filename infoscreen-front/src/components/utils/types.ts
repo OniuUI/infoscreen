@@ -40,7 +40,7 @@ export interface CommentUser {
 }
 
 export interface Column {
-    id: number;
+    id: string;
     title: string;
     tasks: Task[];
 }
