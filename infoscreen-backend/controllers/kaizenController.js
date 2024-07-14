@@ -323,7 +323,7 @@ exports.deleteTask = async (req, res) => {
         try {
             const db = getDb();
             const categories = await db.collection('categories').find().toArray();
-
+            console.log("categories", categories)
             res.send(categories);
         } catch (err) {
             console.error(err);

@@ -3,10 +3,12 @@ import { apiService } from '../components/api/apiservice'; // Adjust the import 
 // Fetch categories from the server
 export const fetchCategories = async () => {
     try {
-        const response = await apiService.get('/categories');
+        const response = await apiService.get('/kaizen/categories');
         if (Array.isArray(response.categories)) {
+            console.log('Fetched categories is categories:', response.categories); // Debugging line
             return response.categories;
         } else {
+            console.log('Invalid categories data:', response);
             console.error('Invalid categories data:', response.categories);
             return [];
         }
@@ -19,7 +21,7 @@ export const fetchCategories = async () => {
 // Add a new category
 export const addCategory = async (categoryName: string) => {
     try {
-        const response = await apiService.post('/categories', { name: categoryName });
+        const response = await apiService.post('/kaizen/categories', { id: Math.random(), title: categoryName });
         return response.category; // Assuming the API returns the added category
     } catch (error) {
         console.error('Error adding category:', error);
@@ -28,9 +30,9 @@ export const addCategory = async (categoryName: string) => {
 };
 
 // Delete a category by ID
-export const deleteCategory = async (categoryId: string) => {
+export const deleteCategory = async (categoryId: number) => {
     try {
-        await apiService.delete(`/categories/${categoryId}`);
+        await apiService.delete(`/kaizen/categories/${categoryId}`);
         return true;
     } catch (error) {
         console.error('Error deleting category:', error);
@@ -39,9 +41,9 @@ export const deleteCategory = async (categoryId: string) => {
 };
 
 // Update a category by ID
-export const updateCategory = async (categoryId: string, categoryName: string) => {
+export const updateCategory = async (categoryId: number, categoryName: string) => {
     try {
-        const response = await apiService.put(`/categories/${categoryId}`, { name: categoryName });
+        const response = await apiService.put(`/kaizen/categories/${categoryId}`, {id: categoryId, title: categoryName });
         return response.data; // Assuming the API returns the updated category
     } catch (error) {
         console.error('Error updating category:', error);

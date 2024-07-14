@@ -1,55 +1,61 @@
 import React, { useState, useEffect } from 'react';
 import {addCategory, deleteCategory, fetchCategories, updateCategory} from '../../service/CategoryService';
-
-interface Category {
-    id: string;
-    name: string;
-}
+import { Column } from '../utils/types';
 
 interface EditCategory {
-    id: string;
-    name: string;
+    id: number;
+    title: string;
 }
 
 interface Props {}
 
 const KaizenSettings: React.FC<Props> = () => {
-    const [categories, setCategories] = useState<Category[]>([]);
+    const [categories, setCategories] = useState<Column[]>([]);
     const [newCategoryName, setNewCategoryName] = useState('');
     const [editingCategory, setEditingCategory] = useState<EditCategory | null>(null);
 
     useEffect(() => {
         const fetchAndSetCategories = async () => {
-            const fetchedCategories = await fetchCategories();
-            if (fetchedCategories) {
-                setCategories(fetchedCategories);
+            try {
+                const fetchedCategories = await fetchCategories();
+                console.log('Fetched Categories:', fetchedCategories); // Debugging line
+                if (fetchedCategories) {
+                    setCategories(fetchedCategories);
+                }
+            } catch (error) {
+                console.error('Failed to fetch categories:', error);
             }
         };
 
         fetchAndSetCategories();
     }, []);
+
     const handleAddCategory = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newCategoryName.trim()) return;
         const newCategory = await addCategory(newCategoryName);
-        setCategories([...categories, newCategory]);
+        if (newCategory) {
+            setCategories([...categories, newCategory]);
+        }
         setNewCategoryName('');
     };
 
-    const handleDeleteCategory = async (categoryId: string) => {
+    const handleDeleteCategory = async (categoryId: number) => {
         await deleteCategory(categoryId);
         setCategories(categories.filter(category => category.id !== categoryId));
     };
 
-    const handleEditCategory = async (e: React.FormEvent, categoryId: string) => {
+    const handleEditCategory = async (e: React.FormEvent, categoryId: number) => {
         e.preventDefault();
-        if (!editingCategory?.name.trim()) return;
-        await updateCategory(categoryId, editingCategory.name);
-        const updatedCategories = categories.map(category => category.id === categoryId ? { ...category, name: editingCategory.name } : category);
-        setCategories(updatedCategories);
-        setEditingCategory(null); // Reset editing state
+        if (editingCategory && editingCategory.title.trim()) {
+            await updateCategory(categoryId, editingCategory.title);
+            const updatedCategories = categories.map(category =>
+                category.id === categoryId ? { ...category, name: editingCategory.title } : category
+            );
+            setCategories(updatedCategories);
+            setEditingCategory(null); // Reset editing state
+        }
     };
-
     return (
         <div className="max-w-xl mx-auto py-8">
             <h2 className="text-2xl font-bold mb-4">Category Settings</h2>
@@ -71,8 +77,8 @@ const KaizenSettings: React.FC<Props> = () => {
                             <form onSubmit={(e) => handleEditCategory(e, category.id)} className="flex gap-2">
                                 <input
                                     type="text"
-                                    value={editingCategory.name}
-                                    onChange={(e) => setEditingCategory({...editingCategory, name: e.target.value})}
+                                    value={editingCategory.title}
+                                    onChange={(e) => setEditingCategory({...editingCategory, title: e.target.value})}
                                     className="flex-1 border border-gray-300 p-2 rounded-md"
                                 />
                                 <button type="submit"
@@ -84,9 +90,9 @@ const KaizenSettings: React.FC<Props> = () => {
                             </form>
                         ) : (
                             <div className="flex justify-between items-center">
-                                <span>{category.name}</span>
+                                <span>{category.title}</span>
                                 <div>
-                                    <button onClick={() => setEditingCategory({id: category.id, name: category.name})}
+                                    <button onClick={() => setEditingCategory({id: category.id, title: category.title})}
                                             className="bg-yellow-500 text-white p-2 rounded-md mr-2 hover:bg-yellow-600">Edit
                                     </button>
                                     <button onClick={() => handleDeleteCategory(category.id)}

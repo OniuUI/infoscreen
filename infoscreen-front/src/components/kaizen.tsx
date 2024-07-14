@@ -112,11 +112,11 @@ const Kaizen: React.FC = () => {
 
                 // Update the columns state
                 setColumns([
-                    { title: 'New', tasks: newTasks },
-                    { title: 'In Progress', tasks: progressTasks },
-                    { title: 'Completed', tasks: completedTasks },
-                    { title: 'Closed', tasks: closedTasks },
-                    { title: 'Canceled', tasks: canceledTasks },
+                    { id: 1, title: 'New', tasks: newTasks },
+                    { id: 2, title: 'In Progress', tasks: progressTasks },
+                    { id: 3, title: 'Completed', tasks: completedTasks },
+                    { id: 4, title: 'Closed', tasks: closedTasks },
+                    { id: 5, title: 'Canceled', tasks: canceledTasks },
                 ]);
             } catch (error) {
                 console.error('Error fetching task data:', error);
@@ -247,11 +247,11 @@ const Kaizen: React.FC = () => {
         ];
 
     const [columns, setColumns] = useState<Column[]>([
-        { title: 'New', tasks: newTasks },
-        { title: 'In Progress', tasks: progressTasks },
-        { title: 'Completed', tasks: completedTasks },
-        { title: 'Closed', tasks: closedTasks },
-        { title: 'Canceled', tasks: canceledTasks },
+        {id: 1, title: 'New', tasks: newTasks },
+        {id: 2,  title: 'In Progress', tasks: progressTasks },
+        {id: 3,  title: 'Completed', tasks: completedTasks },
+        {id: 4,  title: 'Closed', tasks: closedTasks },
+        {id: 5,  title: 'Canceled', tasks: canceledTasks },
     ]);
 
     // Repeat for inProgressTasks, completedTasks, closedTasks, canceledTasks
