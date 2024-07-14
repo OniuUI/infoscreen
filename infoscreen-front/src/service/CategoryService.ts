@@ -15,9 +15,9 @@ export const fetchCategories = async () => {
 };
 
 // Add a new category
-export const addCategory = async (categoryName: string) => {
+export const addCategory = async (categoryName: string, order: number) => {
     try {
-        const response = await apiService.post('/kaizen/categories', { title: categoryName });
+        const response = await apiService.post('/kaizen/categories', { title: categoryName, order: order});
         return response.category; // Assuming the API returns the added category
     } catch (error) {
         console.error('Error adding category:', error);
@@ -37,10 +37,10 @@ export const deleteCategory = async (categoryId: any) => {
 };
 
 // Update a category by ID
-export const updateCategory = async (categoryId: string, categoryName: string) => {
+export const updateCategory = async (categoryId: string, categoryName: string, order: number) => {
     try {
         // Adjust the API call to match the expected response structure
-        const response = await apiService.put(`/kaizen/categories/${categoryId}`, { title: categoryName });
+        const response = await apiService.put(`/kaizen/categories/${categoryId}`, { title: categoryName, order: order});
         // Assuming the API now returns the updated category object directly
         return response.category; // Adjust this line based on the actual response structure
     } catch (error) {

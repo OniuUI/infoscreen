@@ -41,6 +41,7 @@ export interface CommentUser {
 
 export interface Column {
     id: string;
+    order: number;
     title: string;
     tasks: Task[];
 }

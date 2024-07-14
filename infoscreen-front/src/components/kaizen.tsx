@@ -9,6 +9,7 @@ import './css/kaizen.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faMinus, faPlus} from '@fortawesome/free-solid-svg-icons';
 import KaizenNavbar from "./kaizennav";
+import {fetchCategories} from "../service/CategoryService";
 
 interface TaskProps {
     title: string;
@@ -33,6 +34,17 @@ const Kaizen: React.FC = () => {
     const [userIdent, setUserIdent] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [assignToUser, setAssignToUser] = useState(false);
+    const [categories, setCategories] = useState<Column[]>([]);
+
+    useEffect(() => {
+        const loadCategories = async () => {
+            const fetchedCategories = await fetchCategories();
+            // Sort categories by their 'order' property
+            const sortedCategories = fetchedCategories.sort((a: any, b: any) => a.order - b.order);
+            setCategories(sortedCategories);
+        };
+        loadCategories();
+    }, []);
 
     useEffect(() => {
         // Retrieve userIdent from local storage
@@ -89,7 +101,7 @@ const Kaizen: React.FC = () => {
         };
         fetchUsers();
     }, []);
-
+/*
     useEffect(() => {
         const fetchTasks = async () => {
             try {
@@ -127,6 +139,41 @@ const Kaizen: React.FC = () => {
         //const intervalId = setInterval(fetchTasks, 30000); // Fetch every 30 seconds
 
         return; // () => clearInterval(intervalId); // Cleanup interval on unmount
+    }, []);
+*/
+    useEffect(() => {
+        const fetchTasks = async () => {
+            try {
+                // Fetch categories
+                const fetchedCategories = await fetchCategories();
+                const categoriesWithEmptyTasks = fetchedCategories.map((category: {id: string, title: string, tasks: Task[] }) => ({
+                    ...category,
+                    tasks: [],
+                }));
+
+                // Fetch tasks
+                const response = await apiService.get('/kaizen/getTasks');
+                const tasks = response;
+
+                if (!Array.isArray(tasks)) {
+                    console.error('Invalid tasks data:', tasks);
+                    return;
+                }
+
+                // Distribute tasks among categories based on their status
+                const updatedCategories = categoriesWithEmptyTasks.map((category: {id: string,  title: string, tasks: Task[] }) => {
+                    const filteredTasks = tasks.filter((task: Task) => task.status === category.title);
+                    return { ...category, tasks: filteredTasks };
+                });
+
+                // Update the columns state with categories that now include tasks
+                setColumns(updatedCategories);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchTasks();
     }, []);
 
 
@@ -246,13 +293,7 @@ const Kaizen: React.FC = () => {
     const canceledTasks: Task[] = [
         ];
 
-    const [columns, setColumns] = useState<Column[]>([
-        {id: "1", title: 'New', tasks: newTasks },
-        {id: "2",  title: 'In Progress', tasks: progressTasks },
-        {id: "3",  title: 'Completed', tasks: completedTasks },
-        {id: "4",  title: 'Closed', tasks: closedTasks },
-        {id: "5",  title: 'Canceled', tasks: canceledTasks },
-    ]);
+    const [columns, setColumns] = useState<Column[]>([]);
 
     // Repeat for inProgressTasks, completedTasks, closedTasks, canceledTasks
 
