@@ -251,7 +251,7 @@ const Kaizen: React.FC = () => {
     const TaskComplete: React.FC<completeProps> = ({ task, manager, users }) => {
         const handleComplete = async () => {
             // Update the task's status to 'Completed'
-            const updatedTask = { ...task, status: 'Completed' };
+            const updatedTask = { ...task, state: 'Completed' };
 
             // Update the task in the backend
             try {
@@ -261,20 +261,6 @@ const Kaizen: React.FC = () => {
                 return;
             }
 
-            // Move the task to the 'Completed' column in the frontend
-            setColumns(prevColumns => {
-                const newColumns = prevColumns.map(column => {
-                    if (column.title === task.status) {
-                        // Remove the task from its current column
-                        return { ...column, tasks: column.tasks.filter(t => t.id !== task.id) };
-                    } else if (column.title === 'Completed') {
-                        // Add the task to the 'Completed' column
-                        return { ...column, tasks: [...column.tasks, updatedTask] };
-                    }
-                    return column;
-                });
-                return newColumns;
-            });
         };
 
         return (

@@ -54,6 +54,7 @@ exports.login = async (req, res) => {
 
     // Fetch the role of the user
     const role = await roleController.getRoleByUserId(user._id);
+    console.log('Role:', role);
 
     // Create tokens
     const accessToken = generateAccessToken(user._id);

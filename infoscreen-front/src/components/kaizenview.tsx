@@ -115,7 +115,7 @@ const ReadOnlyKaizenBoard: React.FC = () => {
                     const totalTasks = column.tasks.length;
 
                     // Step 2: Calculate completedTasks
-                    const completedTasks = column.tasks.filter(task => task.status === 'Completed').length;
+                    const completedTasks = column.tasks.filter(task => task.state === 'Completed').length;
 
                     return (
                         <div className="column bg-gray-100 p-4 rounded-lg shadow-md" key={column.title}>

@@ -17,6 +17,9 @@ export interface Task {
     status: string;
     comments: Comment[];
     imageUrl: string;
+    state: string;
+    createdDate: any;
+    completedDate: any;
 }
 
 export interface User {

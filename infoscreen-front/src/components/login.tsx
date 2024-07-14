@@ -21,12 +21,12 @@ const Login = () => {
     }
   }, []);
 
-  const updateLocalStorageAsync = (data: { accessToken: string; refreshToken: string; userIdent: string; userRole: string; expiresIn: number }) => {
+  const updateLocalStorageAsync = (data: { accessToken: string; refreshToken: string; userIdent: string; role: string; expiresIn: number }) => {
     return new Promise<void>((resolve) => {
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);
       localStorage.setItem('userIdent', data.userIdent);
-      localStorage.setItem('userRole', data.userRole);
+      localStorage.setItem('userRole', data.role);
       resolve();
     });
   };
