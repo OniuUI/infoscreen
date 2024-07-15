@@ -37,16 +37,6 @@ const Kaizen: React.FC = () => {
     const [categories, setCategories] = useState<Column[]>([]);
 
     useEffect(() => {
-        const loadCategories = async () => {
-            const fetchedCategories = await fetchCategories();
-            // Sort categories by their 'order' property
-            const sortedCategories = fetchedCategories.sort((a: any, b: any) => a.order - b.order);
-            setCategories(sortedCategories);
-        };
-        loadCategories();
-    }, []);
-
-    useEffect(() => {
         // Retrieve userIdent from local storage
         const ident = localStorage.getItem('userIdent');
 
@@ -146,7 +136,8 @@ const Kaizen: React.FC = () => {
             try {
                 // Fetch categories
                 const fetchedCategories = await fetchCategories();
-                const categoriesWithEmptyTasks = fetchedCategories.map((category: {id: string, title: string, tasks: Task[] }) => ({
+                const sortedCategories = fetchedCategories.sort((a: any, b: any) => a.order - b.order);
+                const categoriesWithEmptyTasks = sortedCategories.map((category: {id: string, title: string, tasks: Task[] }) => ({
                     ...category,
                     tasks: [],
                 }));
@@ -249,22 +240,29 @@ const Kaizen: React.FC = () => {
 
     // Add a button for marking the task as complete and a dropdown for changing the status in the Card component
     const TaskComplete: React.FC<completeProps> = ({ task, manager, users }) => {
+        const [taskStatus, setTaskStatus] = useState(task.state);
         const handleComplete = async () => {
-            // Update the task's status to 'Completed'
-            const updatedTask = { ...task, state: 'Completed' };
+            const newStatus = taskStatus === 'Completed' ? 'Open' : 'Completed';
 
             // Update the task in the backend
             try {
+                const updatedTask = { ...task, state: newStatus };
                 await apiService.put(`/kaizen/updateTask/${task.id}?userIdent=${userIdent}&role=${userRole}`, updatedTask);
+                setTaskStatus(newStatus); // Update local state to reflect the new status
             } catch (error) {
                 console.error('Failed to update task:', error);
-                return;
             }
-
         };
 
+        // Determine button text based on the task's current status
+        // Determine button text and color based on the task's current status
+        const buttonText = taskStatus === 'Completed' ? 'Set as Open' : 'Complete Task';
+        const buttonColorClass = taskStatus === 'Completed' ? 'bg-yellow-500' : 'bg-green-500';
+
         return (
-            <button className="complete-task-button" onClick={handleComplete}>Complete Task</button>
+            <button className={`${buttonColorClass}`} onClick={handleComplete}>
+                {buttonText}
+            </button>
         );
     };
 

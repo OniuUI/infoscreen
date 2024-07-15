@@ -5,7 +5,6 @@ import {generateUniqueID} from "web-vitals/dist/modules/lib/generateUniqueID"; /
 export const fetchCategories = async () => {
     try {
         const response = await apiService.get('/kaizen/categories');
-            console.log('Fetched categories:', response.categories); // Debugging line
             return response.categories;
 
     } catch (error) {
