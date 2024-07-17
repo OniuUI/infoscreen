@@ -33,7 +33,7 @@ const KaizenNavbar: React.FC = () => {
                 </div>
             </div>
             <div className="w-full">
-                <Link to="/kaizen/settings" className="w-full text-sm px-5 mr-2 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white flex justify-center items-center">
+                <Link to="/kaizen/settings" className="w-full text-sm px-5 mr-2 py-2 leading-none text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white flex justify-center items-center">
                     <FontAwesomeIcon icon={faCog} /> Settings
                 </Link>
             </div>
