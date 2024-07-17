@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { apiService } from "./api/apiservice";
-import { User, Task, Comment } from './utils/types';
+import { User, Task, Comment, Column } from './utils/types';
 import ProgressComponent from "./progressComponent";
+import {fetchCategories} from "../service/CategoryService";
 
-interface Column {
-    title: string;
-    tasks: Task[];
-}
+
 
 // Task Component
 const TaskComponent: React.FC<{ task: Task, imageUrl: string }> = ({ task, imageUrl }) => {
@@ -46,6 +44,15 @@ const ReadOnlyKaizenBoard: React.FC = () => {
     useEffect(() => {
         const fetchTasks = async () => {
             try {
+                // Fetch categories
+                const fetchedCategories = await fetchCategories();
+                const sortedCategories = fetchedCategories.sort((a: any, b: any) => a.order - b.order);
+                const categoriesWithEmptyTasks = sortedCategories.map((category: Column) => ({
+                    ...category,
+                    tasks: [],
+                }));
+
+                // Fetch tasks
                 const response = await apiService.get('/kaizen/getTasks');
                 const tasks = response;
 
@@ -54,6 +61,7 @@ const ReadOnlyKaizenBoard: React.FC = () => {
                     return;
                 }
 
+                // Fetch images for tasks and update tasks with images
                 const tasksWithImages = await Promise.all(tasks.map(async (task) => {
                     // Check if the image for the user already exists in the state
                     if (userImages[task.assignedTo?._id]) {
@@ -74,25 +82,19 @@ const ReadOnlyKaizenBoard: React.FC = () => {
                     }
                 }));
 
-                const newTasks = tasksWithImages.filter((task: Task) => task.status === 'New');
-                const progressTasks = tasksWithImages.filter((task: Task) => task.status === 'In Progress');
-                const completedTasks = tasksWithImages.filter((task: Task) => task.status === 'Completed');
-                const closedTasks = tasksWithImages.filter((task: Task) => task.status === 'Closed');
-                const canceledTasks = tasksWithImages.filter((task: Task) => task.status === 'Canceled');
+                // Distribute tasks among categories based on their status
+                const updatedCategories = categoriesWithEmptyTasks.map((category: Column) => {
+                    const filteredTasks = tasksWithImages.filter(task => task.status === category.title);
+                    return { ...category, tasks: filteredTasks };
+                });
 
-                setColumns([
-                    { title: 'New', tasks: newTasks },
-                    { title: 'In Progress', tasks: progressTasks },
-                    { title: 'Completed', tasks: completedTasks },
-                    { title: 'Closed', tasks: closedTasks },
-                    { title: 'Canceled', tasks: canceledTasks },
-                ]);
+                // Update the columns state with categories that now include tasks
+                setColumns(updatedCategories);
             } catch (error) {
-                console.error('Error fetching task data:', error);
+                console.error('Error fetching data:', error);
             }
         };
 
-        // Fetch tasks immediately on component mount
         fetchTasks();
 
         // Set up an interval to fetch tasks every 7 seconds
@@ -101,6 +103,7 @@ const ReadOnlyKaizenBoard: React.FC = () => {
         // Clean up the interval on component unmount
         return () => clearInterval(intervalId);
     }, []);
+
 
     // Inside ReadOnlyKaizenBoard component, right before the return statement in the render function
 
