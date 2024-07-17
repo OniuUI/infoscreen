@@ -9,6 +9,7 @@ import './css/kaizen.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faMinus, faPlus} from '@fortawesome/free-solid-svg-icons';
 import KaizenNavbar from "./kaizennav";
+import {fetchCategories} from "../service/CategoryService";
 
 interface TaskProps {
     title: string;
@@ -33,6 +34,22 @@ const Kaizen: React.FC = () => {
     const [userIdent, setUserIdent] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [assignToUser, setAssignToUser] = useState(false);
+    const [taskStatuses, setTaskStatuses] = useState([]);
+    const [columns, setColumns] = useState<Column[]>([]);
+
+    useEffect(() => {
+        const fetchStatuses = async () => {
+            try {
+                const categories = await fetchCategories(); // Assuming this now includes statuses
+                const statuses = categories.map((category: { title: any; }) => category.title); // Assuming the title holds the status
+                setTaskStatuses(statuses);
+            } catch (error) {
+                console.error('Failed to fetch statuses:', error);
+            }
+        };
+
+        fetchStatuses();
+    }, []);
 
     useEffect(() => {
         // Retrieve userIdent from local storage
@@ -93,40 +110,37 @@ const Kaizen: React.FC = () => {
     useEffect(() => {
         const fetchTasks = async () => {
             try {
-                const response = await apiService.get('/kaizen/getTasks');
+                // Fetch categories
+                const fetchedCategories = await fetchCategories();
+                const sortedCategories = fetchedCategories.sort((a: any, b: any) => a.order - b.order);
+                const categoriesWithEmptyTasks = sortedCategories.map((category: {id: string, title: string, tasks: Task[] }) => ({
+                    ...category,
+                    tasks: [],
+                }));
 
+                // Fetch tasks
+                const response = await apiService.get('/kaizen/getTasks');
                 const tasks = response;
 
-                // Check if tasks is defined and is an array
                 if (!Array.isArray(tasks)) {
                     console.error('Invalid tasks data:', tasks);
                     return;
                 }
 
-                // Distribute the tasks among the columns based on their status
-                const newTasks = tasks.filter((task: Task) => task.status === 'New');
-                const progressTasks = tasks.filter((task: Task) => task.status === 'In Progress');
-                const completedTasks = tasks.filter((task: Task) => task.status === 'Completed');
-                const closedTasks = tasks.filter((task: Task) => task.status === 'Closed');
-                const canceledTasks = tasks.filter((task: Task) => task.status === 'Canceled');
+                // Distribute tasks among categories based on their status
+                const updatedCategories = categoriesWithEmptyTasks.map((category: {id: string,  title: string, tasks: Task[] }) => {
+                    const filteredTasks = tasks.filter((task: Task) => task.status === category.title);
+                    return { ...category, tasks: filteredTasks };
+                });
 
-                // Update the columns state
-                setColumns([
-                    { id: "1", title: 'New', tasks: newTasks },
-                    { id: "2", title: 'In Progress', tasks: progressTasks },
-                    { id: "3", title: 'Completed', tasks: completedTasks },
-                    { id: "4", title: 'Closed', tasks: closedTasks },
-                    { id: "5", title: 'Canceled', tasks: canceledTasks },
-                ]);
+                // Update the columns state with categories that now include tasks
+                setColumns(updatedCategories);
             } catch (error) {
-                console.error('Error fetching task data:', error);
+                console.error('Error fetching data:', error);
             }
         };
 
         fetchTasks();
-        //const intervalId = setInterval(fetchTasks, 30000); // Fetch every 30 seconds
-
-        return; // () => clearInterval(intervalId); // Cleanup interval on unmount
     }, []);
 
 
@@ -170,14 +184,6 @@ const Kaizen: React.FC = () => {
         }
     };
 
-    const handleStatusChange = async (task: Task, event: React.ChangeEvent<HTMLSelectElement>) => {
-        try {
-            await apiService.put(`/kaizen/updateTask/${task.id}`, { ...task, status: event.target.value });
-
-        } catch (error) {
-            console.error('Failed to change task status:', error);
-        }
-    };
 
     const handleDeleteTask = async (taskId: string) => {
         try {
@@ -202,57 +208,34 @@ const Kaizen: React.FC = () => {
 
     // Add a button for marking the task as complete and a dropdown for changing the status in the Card component
     const TaskComplete: React.FC<completeProps> = ({ task, manager, users }) => {
+        const [taskStatus, setTaskStatus] = useState(task.state);
         const handleComplete = async () => {
-            // Update the task's status to 'Completed'
-            const updatedTask = { ...task, status: 'Completed' };
+            const newStatus = taskStatus === 'Completed' ? 'Open' : 'Completed';
 
             // Update the task in the backend
             try {
+                const updatedTask = { ...task, state: newStatus };
                 await apiService.put(`/kaizen/updateTask/${task.id}?userIdent=${userIdent}&role=${userRole}`, updatedTask);
+                setTaskStatus(newStatus); // Update local state to reflect the new status
             } catch (error) {
                 console.error('Failed to update task:', error);
-                return;
             }
-
-            // Move the task to the 'Completed' column in the frontend
-            setColumns(prevColumns => {
-                const newColumns = prevColumns.map(column => {
-                    if (column.title === task.status) {
-                        // Remove the task from its current column
-                        return { ...column, tasks: column.tasks.filter(t => t.id !== task.id) };
-                    } else if (column.title === 'Completed') {
-                        // Add the task to the 'Completed' column
-                        return { ...column, tasks: [...column.tasks, updatedTask] };
-                    }
-                    return column;
-                });
-                return newColumns;
-            });
         };
 
+
+        // Determine button text and color based on the task's current status
+        const buttonText = taskStatus === 'Completed' ? 'Set as Open' : 'Complete Task';
+        const buttonColorClass = taskStatus === 'Completed' ? 'bg-yellow-500' : 'bg-green-500';
+
         return (
-            <button className="complete-task-button" onClick={handleComplete}>Complete Task</button>
+            <button className={`${buttonColorClass}`} onClick={handleComplete}>
+                {buttonText}
+            </button>
         );
     };
 
-    const newTasks: Task[] = [
-    ];
-    const progressTasks: Task[] = [
-        ];
-    const completedTasks: Task[] = [
-        ];
-    const closedTasks: Task[] = [
-        ];
-    const canceledTasks: Task[] = [
-        ];
 
-    const [columns, setColumns] = useState<Column[]>([
-        {id: "1", title: 'New', tasks: newTasks },
-        {id: "2",  title: 'In Progress', tasks: progressTasks },
-        {id: "3",  title: 'Completed', tasks: completedTasks },
-        {id: "4",  title: 'Closed', tasks: closedTasks },
-        {id: "5",  title: 'Canceled', tasks: canceledTasks },
-    ]);
+
 
     // Repeat for inProgressTasks, completedTasks, closedTasks, canceledTasks
 
@@ -317,6 +300,46 @@ const Kaizen: React.FC = () => {
         setColumns(newColumns);
     };
 
+    const handleStatusChange = async (task: Task, event: React.ChangeEvent<HTMLSelectElement>) => {
+        const newStatus = event.target.value;
+        try {
+            // Update the task in the backend
+            await apiService.put(`/kaizen/updateTask/${task.id}?userIdent=${userIdent}&role=${userRole}`, { ...task, status: newStatus });
+
+            // Update the task in the local state
+            setColumns(prevColumns => {
+                const taskIndex = prevColumns.findIndex(column => column.tasks.find(t => t.id === task.id));
+                if (taskIndex === -1) return prevColumns; // Task not found in any column
+
+                // Remove the task from its current column
+                let newColumns = prevColumns.map((column, index) => {
+                    if (index === taskIndex) {
+                        return {
+                            ...column,
+                            tasks: column.tasks.filter(t => t.id !== task.id),
+                        };
+                    }
+                    return column;
+                });
+
+                // Add the task to the new column based on the updated status
+                newColumns = newColumns.map(column => {
+                    if (column.title === newStatus) {
+                        return {
+                            ...column,
+                            tasks: [...column.tasks, { ...task, status: newStatus }],
+                        };
+                    }
+                    return column;
+                });
+
+                return newColumns;
+            });
+        } catch (error) {
+            console.error('Failed to change task status:', error);
+        }
+    };
+
 //TODO: Move the TaskColumn component to a separate file
 
     const TaskColumn: React.FC<TaskProps> = ({ title, tasks, users }) => (
@@ -337,7 +360,19 @@ const Kaizen: React.FC = () => {
                                             users={users}
                                             handleDeleteTask={handleDeleteTask}
                                         />
-                                        <TaskComplete task={task} manager={task.manager} subject={task.subject} dueBy={task.dueBy} users={users}/>
+                                        {(userRole === 'admin' || userRole === 'manager') && (
+                                            <select
+                                                value={task.status}
+                                                onChange={(e) => handleStatusChange(task, e)}
+                                                className="w-full px-5 py-3 my-2 border border-gray-700 rounded box-border transition-colors bg-gray-900 text-blue-400 focus:border-blue-400 focus:ring-blue-400 focus:outline-none"
+                                            >
+                                                {taskStatuses.map((status) => (
+                                                    <option key={status} value={status}>{status}</option>
+                                                ))}
+                                            </select>
+                                        )}
+                                        <TaskComplete task={task} manager={task.manager} subject={task.subject}
+                                                      dueBy={task.dueBy} users={users}/>
                                     </div>
                                 )}
                             </Draggable>

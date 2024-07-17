@@ -180,6 +180,16 @@ const AdminForm: React.FC = () => {
     }
   };
 
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImageUrl(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleDelete = async () => {
     if (!selectedUser) return;
@@ -244,16 +254,27 @@ const AdminForm: React.FC = () => {
                 className="mt-1 p-2 rounded border border-gray-300"
             />
           </label>
-          <label className="flex flex-col mb-2 text-sm">
-            Image URL:
-            <input
-                type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                required
-                className="mt-1 p-2 rounded border border-gray-300"
-            />
-          </label>
+          <div>
+            <label className="flex flex-col mb-2 text-sm">
+              Image URL:
+              <input
+                  type="url"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  required
+                  className="mt-1 p-2 rounded border border-gray-300"
+              />
+            </label>
+            <label className="flex flex-col mb-2 text-sm">
+              Upload Image:
+              <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="mt-1 p-2 rounded border border-gray-300"
+              />
+            </label>
+          </div>
           <label className="flex flex-col mb-2 text-sm">
             Email:
             <input

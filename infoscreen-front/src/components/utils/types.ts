@@ -17,6 +17,9 @@ export interface Task {
     status: string;
     comments: Comment[];
     imageUrl: string;
+    state: string;
+    createdDate: any;
+    completedDate: any;
 }
 
 export interface User {
@@ -41,6 +44,7 @@ export interface CommentUser {
 
 export interface Column {
     id: string;
+    order: number;
     title: string;
     tasks: Task[];
 }
