@@ -10,6 +10,9 @@ import Profile from "./components/hub/profile/profile";
 import Hub from "./components/hub/hub";
 import Kaizen from "./components/kaizen";
 import Statistics from "./components/statistics";
+import Kaizenview from "./components/kaizenview";
+import KaizenSettings from "./components/admin/kaizensettings";
+
 
 const App: React.FC = () => {
   return (
@@ -24,6 +27,9 @@ const App: React.FC = () => {
           <Route path="/hub/profile" element={<Profile />} />
           <Route path="/kaizen" element={<Kaizen />} />
           <Route path="/kaizen/statistics" element={<Statistics />} />
+          <Route path="/kaizen/settings" element={<KaizenSettings />} />
+          <Route path="/kaizenview" element={<Kaizenview />}
+          />
         </Routes>
       </div>
     </Router>

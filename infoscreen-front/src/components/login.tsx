@@ -21,37 +21,48 @@ const Login = () => {
     }
   }, []);
 
+  const updateLocalStorageAsync = (data: { accessToken: string; refreshToken: string; userIdent: string; role: string; expiresIn: number }) => {
+    return new Promise<void>((resolve) => {
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem('userIdent', data.userIdent);
+      localStorage.setItem('userRole', data.role);
+      resolve();
+    });
+  };
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoginFailure(false); // Reset the failure state on each login attempt
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/login`, {
-        email,
-        password,
+      const response = await fetch(`${API_BASE_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
       });
+      console.log("login success")
+      const data = await response.json();
+
+      if (response.status !== 200) {
+        throw new Error(data.message);
+      }
 
       // If successful, store the auth tokens and role
-      if (response.data) {
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
-        localStorage.setItem('userIdent', response.data.userIdent);
-        localStorage.setItem('role', response.data.role); // Set the role in local storage
+      await updateLocalStorageAsync(data);
 
-        if(logoutTimer) {
-          clearTimeout(logoutTimer);
-        }
-
-        logoutTimer = setTimeout(() => {
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
-          localStorage.removeItem('userIdent');
-          localStorage.removeItem('role'); // Remove the role from local storage when the token expires
-        }, response.data.expiresIn * 1000);
-
-        setIsLoginSuccess(true);
-        setTimeout(() => navigate('/'), 3000); // Redirect after 3 seconds
+      if(logoutTimer) {
+        clearTimeout(logoutTimer);
       }
+
+
+      setIsLoginSuccess(true);
+      setTimeout(() => navigate('/'), 3000); // Redirect after 3 seconds
     } catch (error) {
       console.error('Error during authentication:', error);
       setIsLoginFailure(true); // Set the failure state on login failure

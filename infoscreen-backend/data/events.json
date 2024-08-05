@@ -1,1 +1,29 @@
-{"events":[{"id":"245d42fb-0e93-4c91-b870-d2cdc3c1b6b7","eventName":"XXL Lunch ","eventDate":"2023-06-22"},{"id":"4971c4fb-6db1-499e-8e5e-c48a33af86ed","eventName":"2. pinsedag","eventDate":"2023-05-29"},{"id":"7c97a3fd-39ef-4886-96b5-0e13fadbbd6c","eventName":"Sommerfest ☀️","eventDate":"2023-06-16"},{"id":"d8a34798-a5be-4d72-af1f-4cdc99ceb956","eventName":"Spania tur! ☀️","eventDate":"2023-05-27"},{"id":"407f6f74-d478-4d10-86a6-d81ba1d2d11d","eventName":"YP Summerparty (I'm on a 🛥️)","eventDate":"2023-06-09"}]}
+{
+    "events": [
+        {
+            "_id": "245d42fb-0e93-4c91-b870-d2cdc3c1b6b7",
+            "eventName": "XXL Lunch ",
+            "eventDate": "2023-06-22"
+        },
+        {
+            "_id": "4971c4fb-6db1-499e-8e5e-c48a33af86ed",
+            "eventName": "2. pinsedag",
+            "eventDate": "2023-05-29"
+        },
+        {
+            "_id": "7c97a3fd-39ef-4886-96b5-0e13fadbbd6c",
+            "eventName": "Sommerfest ☀️",
+            "eventDate": "2023-06-16"
+        },
+        {
+            "_id": "d8a34798-a5be-4d72-af1f-4cdc99ceb956",
+            "eventName": "Spania tur! ☀️",
+            "eventDate": "2023-05-27"
+        },
+        {
+            "_id": "407f6f74-d478-4d10-86a6-d81ba1d2d11d",
+            "eventName": "YP Summerparty (I'm on a 🛥️)",
+            "eventDate": "2023-06-09"
+        }
+    ]
+}

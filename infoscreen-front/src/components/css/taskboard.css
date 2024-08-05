@@ -2,14 +2,14 @@
   display: flex;
   justify-content: space-around;
   padding: 20px;
-  background-color: #f4f4f4;
+  gap: 20px;
+  width: 100%;
 }
 
 .task-column {
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 10px;
-  width: 18%;
   background-color: #fff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -25,6 +25,7 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   flex-grow: 1;
   display: flex;
+  width: 100%;
   flex-direction: column;
 }
 

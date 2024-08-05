@@ -24,10 +24,11 @@ const SetComponentStructure = () => {
         const fetchAvailableComponents = async () => {
             try {
                 let data = await apiService.get('/components/availableComponents'); // replace with your actual API endpoint
-                data = data.map((component: any) => ({
+                data = data.map((component: ComponentInterface) => ({
                     ...component,
                     // Add any additional properties or transformations here
                 }));
+                console.log("Available components", data);
                 // Sort the data if needed
                 // data.sort((a: ComponentInterface, b: ComponentInterface) => /* sorting logic */);
                 setAvailableComponents(data);
