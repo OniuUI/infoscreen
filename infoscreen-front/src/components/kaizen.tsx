@@ -164,7 +164,7 @@ const Kaizen: React.FC = () => {
                 }
                 assignedUser = foundUser; // Set assignedUser to the user object instead of the ID
             }
-            const task = { ...newTask, manager: managerUser, assignedTo: assignedUser, id: uuidv4(), status: 'New' }; // Set manager to the user object instead of the ID
+            const task = { ...newTask, manager: managerUser, assignedTo: assignedUser, id: uuidv4(), status: 'New', createdDate: Date.now() }; // Set manager to the user object instead of the ID
             const response = await apiService.post('/kaizen/createTask', task);
             console.log('Response:', response);
             if (response.success) {
@@ -178,7 +178,7 @@ const Kaizen: React.FC = () => {
                     });
                 });
             }
-            setNewTask({ manager: '', subject: '', dueBy: '', description: '', assignedTo: '' });
+            setNewTask({ manager: '', subject: '', dueBy: '', description: '', assignedTo: ''});
         } catch (error) {
             console.error('Failed to create new task:', error);
         }
@@ -214,7 +214,7 @@ const Kaizen: React.FC = () => {
 
             // Update the task in the backend
             try {
-                const updatedTask = { ...task, state: newStatus };
+                const updatedTask = { ...task, state: newStatus, completedDate: Date.now() };
                 await apiService.put(`/kaizen/updateTask/${task.id}?userIdent=${userIdent}&role=${userRole}`, updatedTask);
                 setTaskStatus(newStatus); // Update local state to reflect the new status
             } catch (error) {
